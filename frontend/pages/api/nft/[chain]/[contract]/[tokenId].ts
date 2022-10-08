@@ -16,7 +16,7 @@ const chainToNetwork = new Map([
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Nft | { message: string }>
+  res: NextApiResponse<{ nft: Nft; owner: string } | { message: string }>
 ) {
   const { chain, contract, tokenId } = req.query
 
@@ -39,5 +39,10 @@ export default async function handler(
     tokenId as string
   )
 
-  res.status(200).json(data)
+  const owner = await alchemy.nft.getOwnersForNft(
+    contract as string,
+    tokenId as string
+  )
+
+  res.status(200).json({ nft: data, owner: owner.owners[0] })
 }
