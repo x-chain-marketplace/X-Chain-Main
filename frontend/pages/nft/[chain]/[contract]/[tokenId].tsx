@@ -1,4 +1,4 @@
-import { Box, Spinner } from '@chakra-ui/react'
+import { Box, Img, Spinner } from '@chakra-ui/react'
 import type { NextPage } from 'next'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
@@ -13,17 +13,16 @@ const NftIndex: NextPage = () => {
 
   const { data: session } = useSession()
   const address = session?.user?.name
-  const [metadata, setMetadata] = useState<Nft | null>(null)
+  const [nft, setNft] = useState<Nft | null>(null)
   const [isLoadingMetadata, setIsLoadingMetadata] = useState<boolean>(false)
 
   useEffect(() => {
     const grabMetadata = async () => {
       setIsLoadingMetadata(true)
       const url = `/api/nft/${chain}/${contract}/${tokenId}`
-      const data = (await axios.get(url)) as Nft
-
-      console.log(`here's the data ${JSON.stringify(data)}`)
-      setMetadata(data)
+      const res = await axios.get(url)
+      const nft = res.data as Nft
+      setNft(nft)
       setIsLoadingMetadata(false)
     }
 
@@ -31,6 +30,9 @@ const NftIndex: NextPage = () => {
       grabMetadata()
     }
   }, [chain, contract, tokenId])
+
+  // TODO make sure this exists go to backup otherwise
+  const image = nft?.media[0].gateway
 
   return (
     <Layout>
@@ -43,7 +45,13 @@ const NftIndex: NextPage = () => {
           {isLoadingMetadata ? (
             <Spinner />
           ) : (
-            <div>{`metadata: ${JSON.stringify(metadata)}`}</div>
+            <>
+              <div>{`title: ${nft?.title}`}</div>
+              <div>{`description: ${nft?.description}`}</div>
+              <Box boxSize="sm">
+                <Img src={image} alt={nft?.title} />
+              </Box>
+            </>
           )}
         </div>
       </Box>
