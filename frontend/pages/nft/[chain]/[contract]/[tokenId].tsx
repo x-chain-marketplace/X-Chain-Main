@@ -25,6 +25,7 @@ import axios from 'axios'
 import { useAccount, useContractRead } from 'wagmi'
 import marketABI from '../../../../artifacts/contracts/Market.sol/Market.json'
 import { Chain } from '../../../../types'
+import { formatEther } from 'ethers/lib/utils'
 
 const mumbaiContractAddress = '0xC885a10d858179140Bc48283217297910A8eE0Dd'
 const goerliContractAddress = '0x3bbF06ad0468F4883e3142A7c7dB6CaD12229cd1'
@@ -191,7 +192,11 @@ const NftIndex: NextPage = () => {
           </>
         )}
         {listInfo ? (
-          <Text fontSize="md">{JSON.stringify(listInfo)}</Text>
+          <>
+            <Text fontSize="md">{`seller: ${listInfo[0]}`}</Text>
+            <Text fontSize="md">{`price: ${formatEther(listInfo[1])}`}</Text>
+            <Text fontSize="md">{`currencyId: ${listInfo[2]}`}</Text>
+          </>
         ) : (
           <Spinner />
         )}
