@@ -12,7 +12,7 @@
     "rpc": "",
     "explore": "",
     "outbox": "0xDDcFEcF17586D08A5740B7D91735fcCE3dfe3eeD",
-    "deployedContract": "",
+    "deployedContract": "0x0A6301DABCf4a372f280434A339410BBBd455ECb",
     "domain": "5"
   },
   "optimism": {
@@ -49,10 +49,10 @@
   },
   "mumbai": {
     "chainId": 80001,
-    "rpc": "",
+    "rpc": "https://matic-mumbai.chainstacklabs.com",
     "explore": "https://mumbai.polygonscan.com/",
     "outbox": "0xe17c37212d785760E8331D4A4395B17b34Ba8cDF",
-    "deployedContract": "",
+    "deployedContract": "0xd4E05427eaf9821b67824bd68ae634ad78A904eF",
     "domain": "80001"
   }
 }

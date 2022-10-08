@@ -3,5 +3,3 @@
 /* eslint-disable */
 import type * as marketSol from "./Market.sol";
 export type { marketSol };
-export type { YourContract } from "./YourContract";
-export type { YourNFT } from "./YourNFT";

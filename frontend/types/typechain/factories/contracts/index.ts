@@ -2,5 +2,3 @@
 /* tslint:disable */
 /* eslint-disable */
 export * as marketSol from "./Market.sol";
-export { YourContract__factory } from "./YourContract__factory";
-export { YourNFT__factory } from "./YourNFT__factory";

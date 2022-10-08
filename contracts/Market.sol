@@ -91,6 +91,11 @@ contract Market is IMessageRecipient, Ownable {
 
   }
 
+  function getPrice(uint32 domainId, address nftContractAddress, uint256 tokenId, address seller) public view returns(uint256){
+    bytes32 key = keccak256(abi.encodePacked(domainId, nftContractAddress, tokenId, seller));
+    return listedPrice[key];
+  }
+
   function _sendMessage (uint32 _destinationDomain, address _receipient, bytes memory _callData) internal {
     IOutbox(outbox).dispatch(_destinationDomain, addressToBytes32(_receipient), _callData);
   }
