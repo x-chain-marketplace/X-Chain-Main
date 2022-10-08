@@ -26,8 +26,8 @@ export const Head = ({
 }): JSX.Element => {
   const router = useRouter()
   const meta: MetaProps = {
-    title: 'Next.js Ethereum Starter',
-    description: 'Next.js - RainbowKit - Hardhat',
+    title: 'xchain marketplace',
+    description: 'Buy NFTs on any L1 or L2 Ethereum blockchain from any chain',
     image: `${WEBSITE_HOST_URL}/images/site-preview.png`,
     type: 'website',
     ...customMeta,
@@ -40,7 +40,7 @@ export const Head = ({
       <meta property="og:url" content={`${WEBSITE_HOST_URL}${router.asPath}`} />
       <link rel="canonical" href={`${WEBSITE_HOST_URL}${router.asPath}`} />
       <meta property="og:type" content={meta.type} />
-      <meta property="og:site_name" content="Next.js Ethereum Starter" />
+      <meta property="og:site_name" content="xchain marketplace" />
       <meta property="og:description" content={meta.description} />
       <meta property="og:title" content={meta.title} />
       <meta property="og:image" content={meta.image} />

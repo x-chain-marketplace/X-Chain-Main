@@ -6,8 +6,6 @@ import {
   RainbowKitProvider,
 } from '@rainbow-me/rainbowkit'
 import '@rainbow-me/rainbowkit/styles.css'
-import type { Session } from 'next-auth'
-import { SessionProvider } from 'next-auth/react'
 import type { AppProps } from 'next/app'
 import { chain, configureChains, createClient, WagmiConfig } from 'wagmi'
 import { alchemyProvider } from 'wagmi/providers/alchemy'
@@ -43,26 +41,21 @@ const wagmiClient = createClient({
   webSocketProvider,
 })
 
-export default function App({
-  Component,
-  pageProps: { session, ...pageProps },
-}: AppProps<{ session: Session }>) {
+export default function App({ Component, pageProps }: AppProps) {
   return (
-    <SessionProvider refetchInterval={0} session={session}>
-      <WagmiConfig client={wagmiClient}>
-        <RainbowKitProvider
-          coolMode
-          appInfo={demoAppInfo}
-          chains={chains}
-          theme={darkTheme({
-            borderRadius: 'small',
-          })}
-        >
-          <ChakraProvider>
-            <Component {...pageProps} />
-          </ChakraProvider>
-        </RainbowKitProvider>
-      </WagmiConfig>
-    </SessionProvider>
+    <WagmiConfig client={wagmiClient}>
+      <RainbowKitProvider
+        coolMode
+        appInfo={demoAppInfo}
+        chains={chains}
+        theme={darkTheme({
+          borderRadius: 'small',
+        })}
+      >
+        <ChakraProvider>
+          <Component {...pageProps} />
+        </ChakraProvider>
+      </RainbowKitProvider>
+    </WagmiConfig>
   )
 }
