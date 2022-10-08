@@ -4,6 +4,8 @@ import {
   Input,
   InputGroup,
   InputLeftElement,
+  Radio,
+  RadioGroup,
   Stack,
 } from '@chakra-ui/react'
 import type { NextPage } from 'next'
@@ -11,33 +13,31 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 import { Layout } from '../components/layout/Layout'
+import { Chain } from '../types'
 
 const Home: NextPage = () => {
   const router = useRouter()
-  const [chain, setChain] = useState('')
-  const handleChainChange = (event: any) => setChain(event.target.value)
+
   const [contract, setContract] = useState('')
   const handleContractChange = (event: any) => setContract(event.target.value)
   const [tokenId, setTokenId] = useState('')
+  const [chain, setChain] = useState(Chain.ethereum)
+
   const handleTokenIdChange = (event: any) => setTokenId(event.target.value)
   return (
     <Layout>
       <Box>
         <Stack spacing={4}>
-          <InputGroup>
-            <InputLeftElement
-              pointerEvents="none"
-              color="gray.300"
-              fontSize="1.2em"
-              children="$"
-            />
-            <Input
-              type="text"
-              placeholder="chain"
-              value={chain}
-              onChange={handleChainChange}
-            />
-          </InputGroup>
+          <RadioGroup
+            onChange={(value) => setChain(value as Chain)}
+            value={chain}
+          >
+            <Stack direction="row">
+              <Radio value={Chain.ethereum}>Ethereum</Radio>
+              <Radio value={Chain.optimism}>Optimism</Radio>
+              <Radio value={Chain.polygon}>Polygon</Radio>
+            </Stack>
+          </RadioGroup>
           <InputGroup>
             <InputLeftElement
               pointerEvents="none"

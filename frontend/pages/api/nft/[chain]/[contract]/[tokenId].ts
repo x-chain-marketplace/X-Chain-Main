@@ -1,11 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { Network, Alchemy, Nft } from 'alchemy-sdk'
-
-enum Chain {
-  ethereum = 'ethereum',
-  optimism = 'optimism',
-  polygon = 'polygon',
-}
+import { Chain } from '../../../../../types'
 
 const chainToKey = new Map([
   [Chain.ethereum, process.env.ETH_KEY],
