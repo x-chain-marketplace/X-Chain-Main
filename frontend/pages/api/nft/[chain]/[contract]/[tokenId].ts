@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { Network, Alchemy } from 'alchemy-sdk'
+import { Network, Alchemy, Nft } from 'alchemy-sdk'
 
 enum Chain {
   ethereum = 'ethereum',
@@ -21,7 +21,7 @@ const chainToNetwork = new Map([
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<any>
+  res: NextApiResponse<Nft | { message: string }>
 ) {
   const { chain, contract, tokenId } = req.query
 
