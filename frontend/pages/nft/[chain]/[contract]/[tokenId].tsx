@@ -104,6 +104,8 @@ const NftIndex: NextPage = () => {
     chainId: 80001,
   })
 
+  const sellerConnected = listInfo && listInfo[0] === address
+
   console.log(`listInfo: ${isLoadingListInfo}`)
   console.log(`listInfo: ${listInfo}`)
 
@@ -207,6 +209,7 @@ const NftIndex: NextPage = () => {
           <div>{`chain: ${chain}`}</div>
           <div>{`contract address: ${contract}`}</div>
           <div>{`tokenId: ${tokenId}`}</div>
+          <div>{`NFT seller currenctly connected: ${sellerConnected}`}</div>
         </Box>
       </Box>
       <Modal closeOnOverlayClick={false} isOpen={isOpen} onClose={onClose}>
