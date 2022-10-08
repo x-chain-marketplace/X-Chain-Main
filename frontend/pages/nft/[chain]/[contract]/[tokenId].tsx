@@ -22,7 +22,22 @@ import { useEffect, useState } from 'react'
 import { Layout } from '../../../../components/layout/Layout'
 import { Nft } from 'alchemy-sdk'
 import axios from 'axios'
-import { useAccount } from 'wagmi'
+import { useAccount, useContractRead } from 'wagmi'
+import marketABI from '../../../../artifacts/contracts/Market.sol/Market.json'
+import { Chain } from '../../../../types'
+
+const mumbaiContractAddress = '0x615661184ef0D451F9F0110aF8F33950F668f0C5'
+const goerliContractAddress = '0x8049ad567CB4265a42213ec0ef939Cdb13E66595'
+
+const chainToContractAddress = new Map<Chain, string>([
+  [Chain.ethereum, goerliContractAddress],
+  [Chain.polygon, mumbaiContractAddress],
+])
+
+const chainToHyperlaneId = new Map<Chain, string>([
+  [Chain.ethereum, '5'],
+  [Chain.polygon, '80001'],
+])
 
 enum TransactionState {
   pending = 'pending',
@@ -37,18 +52,23 @@ const NftIndex: NextPage = () => {
 
   const { address } = useAccount()
   const [nft, setNft] = useState<Nft | null>(null)
+  const [nftOwner, setNftOwner] = useState<string | null>(null)
   const [isLoadingMetadata, setIsLoadingMetadata] = useState<boolean>(false)
   const [transactionState, setTransactionState] = useState<TransactionState>(
     TransactionState.notStarted
   )
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const listedWithUs =
+    nftOwner != null &&
+    [mumbaiContractAddress, goerliContractAddress].includes(nftOwner)
 
   useEffect(() => {
     const grabMetadata = async () => {
       setIsLoadingMetadata(true)
       const url = `/api/nft/${chain}/${contract}/${tokenId}`
       const res = await axios.get(url)
-      const nft = res.data as Nft
+      const { nft, owner } = res.data as { nft: Nft; owner: string }
+      setNftOwner(owner)
       setNft(nft)
       setIsLoadingMetadata(false)
     }
@@ -129,7 +149,14 @@ const NftIndex: NextPage = () => {
         ) : (
           <>
             <Heading marginBottom={5}>{nft?.title}</Heading>
-            <Text fontSize="lg">{nft?.description}</Text>
+            <Text fontSize="lg" marginBottom={2}>
+              {nft?.description}
+            </Text>
+            <Text fontSize="md">
+              {listedWithUs
+                ? 'Listed on name placholder'
+                : `Owned by ${nftOwner}`}
+            </Text>
             <Img
               src={image}
               alt={nft?.title}
