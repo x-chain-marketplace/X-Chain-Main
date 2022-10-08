@@ -17,34 +17,27 @@ async function main() {
   // fs.unlinkSync(`${config.paths.artifacts}/contracts/contractAddress.ts`);
 
   // We get the contract to deploy
-  const YourContract = await ethers.getContractFactory('YourContract');
-  const contract = await YourContract.deploy();
-  await contract.deployed();
-  console.log('YourContract deployed to:', contract.address);
+  const outboxAddress = "0xe17c37212d785760E8331D4A4395B17b34Ba8cDF";
+  const MarketContract = await ethers.getContractFactory('Market');
+  const market = await MarketContract.deploy(outboxAddress);
+  await market.deployed();
+  console.log("YourContract deployed to:", market.address);
 
-  const YourNFT = await ethers.getContractFactory('YourNFT');
-  const YourNFTContract = await YourNFT.deploy();
-  await YourNFTContract.deployed();
-  console.log('YourNFT deployed to:', YourNFTContract.address);
   saveFrontendFiles(
-    contract.address,
-    'YourContract',
-    YourNFTContract.address,
-    'YourNFTContract'
+    market.address,
+    "Market"
   );
 }
 
 // https://github.com/nomiclabs/hardhat-hackathon-boilerplate/blob/master/scripts/deploy.js
 function saveFrontendFiles(
   contractAddress: string,
-  contractName: string,
-  nftContractAddress: string,
-  nftContractName: string
+  contractName: string
 ) {
   fs.writeFileSync(
     `${config.paths.artifacts}/contracts/contractAddress.ts`,
-    `export const ${contractName} = '${contractAddress}'\nexport const ${nftContractName} = '${nftContractAddress}'\n`
-  );
+    `export const ${contractName} = '${contractAddress}'\n`
+  )
 }
 
 // We recommend this pattern to be able to use async/await everywhere

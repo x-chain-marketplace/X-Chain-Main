@@ -1,0 +1,58 @@
+{
+  "ethereum": {
+    "chainId": 1,
+    "rpc": "",
+    "explore": "https://etherscan.io/",
+    "outbox": "0x2f9DB5616fa3fAd1aB06cB2C906830BA63d135e3",
+    "deployedContract": "",
+    "domain": "0x657468"
+  },
+  "goerli": {
+    "chainId": 5,
+    "rpc": "",
+    "explore": "",
+    "outbox": "0xDDcFEcF17586D08A5740B7D91735fcCE3dfe3eeD",
+    "deployedContract": "0x0A6301DABCf4a372f280434A339410BBBd455ECb",
+    "domain": "5"
+  },
+  "optimism": {
+    "chainId": 10,
+    "rpc": "",
+    "explore": "https://optimistic.etherscan.io/",
+    "outbox": "0x0be2Ae2f6D02a3e0e00ECB57D3E1fCbb7f8F38F4",
+    "deployedContract": "",
+    "domain": "0x6f70"
+  },
+  "optimistic_kovan": {
+    "chainId": 69,
+    "rpc": "https://kovan.optimism.io",
+    "explore": "https://kovan-optimistic.etherscan.io/",
+    "outbox": "0x981f5C4070bC048186CDE1CcB61Ea5c969194b54",
+    "deployedContract": "",
+    "domain": "0x6f702d6b"
+  },
+  "polygon": {
+    "chainId": 137,
+    "rpc": "",
+    "explore": "https://polygonscan.com/",
+    "outbox": "0x981f5C4070bC048186CDE1CcB61Ea5c969194b54",
+    "deployedContract": "",
+    "domain": "0x706f6c79"
+  },
+  "moonbase": {
+    "chainId": 1287,
+    "rpc": "https://rpc.api.moonbase.moonbeam.network",
+    "explore": "https://moonbase.moonscan.io/",
+    "outbox": "0x54148470292C24345fb828B003461a9444414517",
+    "deployedContract": "",
+    "domain": "0x6d6f2d61"
+  },
+  "mumbai": {
+    "chainId": 80001,
+    "rpc": "https://matic-mumbai.chainstacklabs.com",
+    "explore": "https://mumbai.polygonscan.com/",
+    "outbox": "0xe17c37212d785760E8331D4A4395B17b34Ba8cDF",
+    "deployedContract": "0xd4E05427eaf9821b67824bd68ae634ad78A904eF",
+    "domain": "80001"
+  }
+}
