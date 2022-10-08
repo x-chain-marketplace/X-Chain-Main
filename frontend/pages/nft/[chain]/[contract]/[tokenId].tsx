@@ -152,9 +152,7 @@ const NftIndex: NextPage = () => {
         <ModalContent>
           <ModalHeader>Transaction Summary</ModalHeader>
           <ModalCloseButton />
-          <ModalBody pb={6}>
-            Here's what's going to happen with this transaction
-          </ModalBody>
+          <ModalBody pb={6}>Insightful Transaction Summary</ModalBody>
           {modalInterior(transactionState)};
         </ModalContent>
       </Modal>
