@@ -16,7 +16,6 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Spacer,
   Spinner,
   useDisclosure,
   Link,
@@ -68,8 +67,8 @@ const NftIndex: NextPage = () => {
   const [transactionState, setTransactionState] = useState<TransactionState>(
     TransactionState.notStarted
   )
-  const { colorMode, toggleColorMode } = useColorMode();
-  
+  const { colorMode, toggleColorMode } = useColorMode()
+
   const { isOpen, onOpen, onClose } = useDisclosure()
   const listedWithUs =
     nftOwner != null &&
@@ -195,27 +194,30 @@ const NftIndex: NextPage = () => {
     }
 
     return (
-      <>
-        <Heading marginBottom={5}>{nft?.title}</Heading>
-        <Text fontSize="lg" marginBottom={2}>
-          {nft?.description}
-        </Text>
-        <Text fontSize="md">
-          {listedWithUs ? 'Listed on name placholder' : `Owned by ${nftOwner}`}
-        </Text>
+      <Box>
         <Img
           src={image}
           alt={nft?.title}
-          boxSize="sm"
-          marginBottom={10}
-          marginTop={10}
+          boxSize="lg"
+          borderRadius="xl"
+          mx="auto"
+          marginBottom={5}
+          objectFit="cover"
         />
-        <Button onClick={onOpen}>
-          {userConnectedChain
-            ? `Buy NFT on ${userConnectedChain.name}`
-            : `Connect wallet to buy NFT`}
-        </Button>
-      </>
+        <div>
+          <Flex flexDirection="column">
+            <Text fontSize="xs">Contract Address:</Text>
+            <Text fontSize="xl">{`${contract}`}</Text>
+          </Flex>
+        </div>
+
+        <div>
+          <Flex flexDirection="column">
+            <Text fontSize="xs">TokenId:</Text>
+            <Text fontSize="xl">{`${tokenId}`}</Text>
+          </Flex>
+        </div>
+      </Box>
     )
   }
 
@@ -236,62 +238,6 @@ const NftIndex: NextPage = () => {
     }
 
     return (
-      <>
-        <Text fontSize="md">{`seller: ${listingInfo[0]}`}</Text>
-        <Text fontSize="md">{`price: ${formatEther(listingInfo[1])}`}</Text>
-        <Text fontSize="md">{`currencyId: ${listingInfo[2]}`}</Text>
-      </>
-    )
-  }
-
-  return (
-
-    <Layout>
-    <Button onClick={toggleColorMode}  size={'sm'} variant='link'>
-      {colorMode === 'light' ? <Text> </Text> : <Text> </Text>}
-    </Button>
-
-    <Grid
-      h='500px'
-      templateRows='repeat(2, 1fr)'
-      templateColumns='repeat(2, 1fr)'
-      gap={4}
-      
-    >
-      <GridItem colSpan={1} bg='#170D27' borderRadius="xl" borderColor="#ffffff" border="5px" p="10">
-        <Box>
-          {isLoadingMetadata ? (
-            <Spinner />
-          ) : (
-            <>           
-            <Img
-              src={image}
-              alt={nft?.title}
-              boxSize="lg"
-              borderRadius="xl"
-              mx="auto"
-              marginBottom={5}
-              objectFit='cover'
-            />
-            <div>
-              <Flex flexDirection="column">
-                <Text fontSize="xs">Contract Address:</Text>
-                <Text fontSize="xl">{`${contract}`}</Text>
-              </Flex>
-            </div>
-
-            <div>
-              <Flex flexDirection="column">
-                <Text fontSize="xs">TokenId:</Text>
-                <Text fontSize="xl">{`${tokenId}`}</Text>
-              </Flex>
-            </div>
-            </>
-          )}
-        </Box>
-      </GridItem>
-      <GridItem colSpan={1} bg='#170D27' borderRadius="xl" borderColor="#ffffff" border="5px" p="10">
-
       <Box>
         {isLoadingMetadata ? (
           <Spinner />
@@ -299,68 +245,111 @@ const NftIndex: NextPage = () => {
           <>
             <Heading marginBottom={5}>{nft?.title}</Heading>
             <Text fontSize="lg">{nft?.description}</Text>
-            {/* <Button onClick={onOpen}>Buy NFT</Button> */}
             <Box marginTop={10}>
               <div>
                 <Flex>
                   <Image
-                      mb={4}
-                      ml={5}
-                      pr={5}
-                      src='wallet-icon.svg'
-                      fallbackSrc='wallet-icon.svg'
-                      borderRadius='full'
-                  /> 
+                    mb={4}
+                    ml={5}
+                    pr={5}
+                    src="wallet-icon.svg"
+                    fallbackSrc="wallet-icon.svg"
+                    borderRadius="full"
+                  />
                   <Flex flexDirection="column">
                     <Text fontSize="xs">Owner:</Text>
-                    <Text fontSize="xl" as='b' maxWidth="350px" noOfLines="1" textTransform="uppercase">{`${address}`}</Text>
-                    
+                    <Text
+                      fontSize="xl"
+                      as="b"
+                      maxWidth="350px"
+                      noOfLines={1}
+                      textTransform="uppercase"
+                    >{`${address}`}</Text>
                   </Flex>
                 </Flex>
               </div>
               <div>
                 <Flex>
                   <Image
-                      mb={4}
-                      ml={5}
-                      pr={5}
-                      src='chain-icon.svg'
-                      fallbackSrc='chain-icon.svg'
-                  /> 
+                    mb={4}
+                    ml={5}
+                    pr={5}
+                    src="chain-icon.svg"
+                    fallbackSrc="chain-icon.svg"
+                  />
                   <Flex flexDirection="column">
                     <Text fontSize="xs">Chain:</Text>
-                    <Text fontSize="xl" as='b'>Hi</Text>
-                    
+                    <Text fontSize="xl" as="b">
+                      {listingChain}
+                    </Text>
                   </Flex>
                 </Flex>
               </div>
               <div>
                 <Flex>
                   <Image
-                      mb={4}
-                      ml={5}
-                      pr={5}
-                      src='price-icon.svg'
-                      fallbackSrc='price-icon.svg'
-                      borderRadius='full'
-                  /> 
+                    mb={4}
+                    ml={5}
+                    pr={5}
+                    src="price-icon.svg"
+                    fallbackSrc="price-icon.svg"
+                    borderRadius="full"
+                  />
                   <Flex flexDirection="column">
                     <Text fontSize="xs">Price:</Text>
-                    <Text fontSize="xl" as='b'>Add Price</Text>
-                    
+                    <Text fontSize="xl" as="b">
+                      {formatEther(listingInfo[1])}
+                    </Text>
                   </Flex>
                 </Flex>
               </div>
             </Box>
             <Box>
-              <Button onClick={onOpen}>Buy NFT</Button>
+              <Button onClick={onOpen}>
+                {userConnectedChain
+                  ? `Buy on ${userConnectedChain.name}`
+                  : 'connect your wallet to buy this'}
+              </Button>
             </Box>
-            </>
-          )}
+          </>
+        )}
       </Box>
+    )
+  }
 
-      </GridItem>
-    </Grid>
+  return (
+    <Layout>
+      <Button onClick={toggleColorMode} size={'sm'} variant="link">
+        {colorMode === 'light' ? <Text> </Text> : <Text> </Text>}
+      </Button>
+
+      <Grid
+        h="500px"
+        templateRows="repeat(2, 1fr)"
+        templateColumns="repeat(2, 1fr)"
+        gap={4}
+      >
+        <GridItem
+          colSpan={1}
+          bg="#170D27"
+          borderRadius="xl"
+          borderColor="#ffffff"
+          border="5px"
+          p="10"
+        >
+          {nftData(nft, isLoadingMetadata)}
+        </GridItem>
+        <GridItem
+          colSpan={1}
+          bg="#170D27"
+          borderRadius="xl"
+          borderColor="#ffffff"
+          border="5px"
+          p="10"
+        >
+          {listingData(listingInfo, isLoadingListingInfo)}
+        </GridItem>
+      </Grid>
 
       <Modal closeOnOverlayClick={false} isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
