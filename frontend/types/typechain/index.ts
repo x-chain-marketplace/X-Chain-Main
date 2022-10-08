@@ -12,6 +12,8 @@ export type { AggregatorV3Interface } from "./@chainlink/contracts/src/v0.8/inte
 export { AggregatorV3Interface__factory } from "./factories/@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface__factory";
 export type { Ownable } from "./@openzeppelin/contracts/access/Ownable";
 export { Ownable__factory } from "./factories/@openzeppelin/contracts/access/Ownable__factory";
+export type { IERC20 } from "./@openzeppelin/contracts/token/ERC20/IERC20";
+export { IERC20__factory } from "./factories/@openzeppelin/contracts/token/ERC20/IERC20__factory";
 export type { IERC721 } from "./@openzeppelin/contracts/token/ERC721/IERC721";
 export { IERC721__factory } from "./factories/@openzeppelin/contracts/token/ERC721/IERC721__factory";
 export type { IERC165 } from "./@openzeppelin/contracts/utils/introspection/IERC165";
