@@ -26,8 +26,8 @@ import { useAccount, useContractRead } from 'wagmi'
 import marketABI from '../../../../artifacts/contracts/Market.sol/Market.json'
 import { Chain } from '../../../../types'
 
-const mumbaiContractAddress = '0x615661184ef0D451F9F0110aF8F33950F668f0C5'
-const goerliContractAddress = '0x8049ad567CB4265a42213ec0ef939Cdb13E66595'
+const mumbaiContractAddress = '0xC885a10d858179140Bc48283217297910A8eE0Dd'
+const goerliContractAddress = '0x3bbF06ad0468F4883e3142A7c7dB6CaD12229cd1'
 
 const chainToContractAddress = new Map<Chain, string>([
   [Chain.ethereum, goerliContractAddress],
@@ -80,6 +80,29 @@ const NftIndex: NextPage = () => {
 
   // TODO make sure this exists go to backup otherwise
   const image = nft?.media[0].gateway
+
+  const getListInformationArgs = [
+    chainToHyperlaneId.get(chain as Chain) as string,
+    contract,
+    tokenId,
+  ]
+
+  console.log(getListInformationArgs)
+
+  const {
+    data: listInfo,
+    isError: islistInfoError,
+    isLoading: isLoadingListInfo,
+  } = useContractRead({
+    addressOrName: chainToContractAddress.get(Chain.polygon) as string,
+    contractInterface: marketABI as any,
+    functionName: 'getListInformation',
+    args: getListInformationArgs,
+    chainId: 80001,
+  })
+
+  console.log(`listInfo: ${isLoadingListInfo}`)
+  console.log(`listInfo: ${listInfo}`)
 
   const modalInterior = (transactionState: TransactionState) => {
     switch (transactionState) {
@@ -166,6 +189,11 @@ const NftIndex: NextPage = () => {
             />
             <Button onClick={onOpen}>Buy NFT</Button>
           </>
+        )}
+        {listInfo ? (
+          <Text fontSize="md">{JSON.stringify(listInfo)}</Text>
+        ) : (
+          <Spinner />
         )}
         <Box marginTop={10}>
           <div>{`current wallet address: ${address}`}</div>
