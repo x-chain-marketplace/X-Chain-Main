@@ -14,7 +14,7 @@
     "@emotion/react": "^11.10.4",
     "@emotion/styled": "^11.10.4",
     "@rainbow-me/rainbowkit": "^0.7.0",
-    "@rainbow-me/rainbowkit-siwe-next-auth": "^0.1.4",
+    "alchemy-sdk": "^2.1.1",
     "ethers": "^5.7.1",
     "framer-motion": "^7.5.1",
     "ipfs-http-client": "^58.0.1",

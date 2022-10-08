@@ -5,10 +5,6 @@ import {
   getDefaultWallets,
   RainbowKitProvider,
 } from '@rainbow-me/rainbowkit'
-import {
-  GetSiweMessageOptions,
-  RainbowKitSiweNextAuthProvider,
-} from '@rainbow-me/rainbowkit-siwe-next-auth'
 import '@rainbow-me/rainbowkit/styles.css'
 import type { Session } from 'next-auth'
 import { SessionProvider } from 'next-auth/react'
@@ -19,19 +15,9 @@ import { publicProvider } from 'wagmi/providers/public'
 
 const { chains, provider, webSocketProvider } = configureChains(
   [
-    chain.mainnet,
-    chain.polygon,
-    chain.optimism,
-    chain.arbitrum,
-    ...(process.env.NEXT_PUBLIC_ENABLE_TESTNETS === 'true'
-      ? [
-          chain.goerli,
-          chain.kovan,
-          chain.rinkeby,
-          chain.ropsten,
-          chain.localhost,
-        ]
-      : []),
+    ...(process.env.NEXT_PUBLIC_TESTNET === 'true'
+      ? [chain.goerli, chain.optimismGoerli, chain.polygonMumbai]
+      : [chain.mainnet, chain.polygon, chain.optimism]),
   ],
   [
     alchemyProvider({ apiKey: '_gg7wSSi0KMBsdKnGVfHDueq6xMB9EkC' }),
@@ -57,10 +43,6 @@ const wagmiClient = createClient({
   webSocketProvider,
 })
 
-const getSiweMessageOptions: GetSiweMessageOptions = () => ({
-  statement: 'Sign in to the RainbowKit + SIWE example app',
-})
-
 export default function App({
   Component,
   pageProps: { session, ...pageProps },
@@ -68,21 +50,18 @@ export default function App({
   return (
     <SessionProvider refetchInterval={0} session={session}>
       <WagmiConfig client={wagmiClient}>
-        <RainbowKitSiweNextAuthProvider
-          getSiweMessageOptions={getSiweMessageOptions}
+        <RainbowKitProvider
+          coolMode
+          appInfo={demoAppInfo}
+          chains={chains}
+          theme={darkTheme({
+            borderRadius: 'small',
+          })}
         >
-          <RainbowKitProvider
-            appInfo={demoAppInfo}
-            chains={chains}
-            theme={darkTheme({
-              borderRadius: 'small',
-            })}
-          >
-            <ChakraProvider>
-              <Component {...pageProps} />
-            </ChakraProvider>
-          </RainbowKitProvider>
-        </RainbowKitSiweNextAuthProvider>
+          <ChakraProvider>
+            <Component {...pageProps} />
+          </ChakraProvider>
+        </RainbowKitProvider>
       </WagmiConfig>
     </SessionProvider>
   )
