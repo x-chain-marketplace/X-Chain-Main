@@ -1,6 +1,5 @@
 import { Box, Img, Spinner } from '@chakra-ui/react'
 import type { NextPage } from 'next'
-import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { Layout } from '../../../../components/layout/Layout'
