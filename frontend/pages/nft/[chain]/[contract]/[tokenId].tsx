@@ -26,6 +26,7 @@ import { useAccount, useContractRead } from 'wagmi'
 import marketABI from '../../../../artifacts/contracts/Market.sol/Market.json'
 import { Chain } from '../../../../types'
 import { formatEther, getAddress } from 'ethers/lib/utils'
+import { BigNumber } from 'ethers'
 
 const mumbaiContractAddress = '0xC885a10d858179140Bc48283217297910A8eE0Dd'
 const goerliContractAddress = '0x3bbF06ad0468F4883e3142A7c7dB6CaD12229cd1'
@@ -46,6 +47,8 @@ enum TransactionState {
   complete = 'complete',
   notStarted = 'notStarted',
 }
+
+type ListingInfo = [string, BigNumber, string]
 
 const NftIndex: NextPage = () => {
   const router = useRouter()
@@ -93,7 +96,7 @@ const NftIndex: NextPage = () => {
   console.log(getListInformationArgs)
 
   const {
-    data: listInfo,
+    data: listingInfoData,
     isError: islistInfoError,
     isLoading: isLoadingListInfo,
   } = useContractRead({
@@ -103,11 +106,8 @@ const NftIndex: NextPage = () => {
     args: getListInformationArgs,
     chainId: 80001,
   })
-
-  const sellerConnected = listInfo && listInfo[0] === address
-
-  console.log(`listInfo: ${isLoadingListInfo}`)
-  console.log(`listInfo: ${listInfo}`)
+  const listingInfo = listingInfoData as ListingInfo | undefined
+  const sellerConnected = listingInfo && listingInfo[0] === address
 
   const modalInterior = (transactionState: TransactionState) => {
     switch (transactionState) {
@@ -195,11 +195,11 @@ const NftIndex: NextPage = () => {
             <Button onClick={onOpen}>Buy NFT</Button>
           </>
         )}
-        {listInfo ? (
+        {listingInfo ? (
           <>
-            <Text fontSize="md">{`seller: ${listInfo[0]}`}</Text>
-            <Text fontSize="md">{`price: ${formatEther(listInfo[1])}`}</Text>
-            <Text fontSize="md">{`currencyId: ${listInfo[2]}`}</Text>
+            <Text fontSize="md">{`seller: ${listingInfo[0]}`}</Text>
+            <Text fontSize="md">{`price: ${formatEther(listingInfo[1])}`}</Text>
+            <Text fontSize="md">{`currencyId: ${listingInfo[2]}`}</Text>
           </>
         ) : (
           <Spinner />
