@@ -132,7 +132,6 @@ contract Market is IMessageRecipient, Ownable {
         sellerAddress[keccak256(abi.encodePacked(selfDomainId, nftContractAddress, tokenId))] = address(0);
         _clearListing(key);
     }
-
   }
 
   function getListInformation(uint32 domainId, address nftContractAddress, uint256 tokenId)public view returns(address, uint256, uint32) {
