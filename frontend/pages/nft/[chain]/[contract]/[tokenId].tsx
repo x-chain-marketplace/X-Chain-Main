@@ -22,7 +22,7 @@ import { useEffect, useState } from 'react'
 import { Layout } from '../../../../components/layout/Layout'
 import { Nft } from 'alchemy-sdk'
 import axios from 'axios'
-import { useAccount, useContractRead } from 'wagmi'
+import { useAccount, useContractRead, useNetwork } from 'wagmi'
 import marketABI from '../../../../artifacts/contracts/Market.sol/Market.json'
 import { Chain } from '../../../../types'
 import { formatEther, getAddress } from 'ethers/lib/utils'
@@ -52,12 +52,14 @@ type ListingInfo = [string, BigNumber, string]
 
 const NftIndex: NextPage = () => {
   const router = useRouter()
-  const { chain, contract, tokenId } = router.query
+  const { chain: listingChain, contract, tokenId } = router.query
 
   const { address } = useAccount()
+  const { chain: userConnectedChain } = useNetwork()
   const [nft, setNft] = useState<Nft | null>(null)
   const [nftOwner, setNftOwner] = useState<string | null>(null)
   const [isLoadingMetadata, setIsLoadingMetadata] = useState<boolean>(false)
+  const [isErrorFetchingMetadata, setIsErrorFetchingMetadata] = useState(false)
   const [transactionState, setTransactionState] = useState<TransactionState>(
     TransactionState.notStarted
   )
@@ -70,25 +72,31 @@ const NftIndex: NextPage = () => {
 
   useEffect(() => {
     const grabMetadata = async () => {
-      setIsLoadingMetadata(true)
-      const url = `/api/nft/${chain}/${contract}/${tokenId}`
-      const res = await axios.get(url)
-      const { nft, owner } = res.data as { nft: Nft; owner: string }
-      setNftOwner(owner)
-      setNft(nft)
-      setIsLoadingMetadata(false)
+      try {
+        setIsLoadingMetadata(true)
+        const url = `/api/nft/${listingChain}/${contract}/${tokenId}`
+        const res = await axios.get(url)
+        const { nft, owner } = res.data as { nft: Nft; owner: string }
+        setNftOwner(owner)
+        setNft(nft)
+        setIsLoadingMetadata(false)
+        setIsErrorFetchingMetadata(false)
+      } catch (e) {
+        console.log(e)
+        setIsErrorFetchingMetadata(true)
+      }
     }
 
-    if (chain && contract && tokenId) {
+    if (listingChain && contract && tokenId) {
       grabMetadata()
     }
-  }, [chain, contract, tokenId])
+  }, [listingChain, contract, tokenId])
 
   // TODO make sure this exists go to backup otherwise
   const image = nft?.media[0].gateway
 
   const getListInformationArgs = [
-    chainToHyperlaneId.get(chain as Chain) as string,
+    chainToHyperlaneId.get(listingChain as Chain) as string,
     contract,
     tokenId,
   ]
@@ -97,35 +105,34 @@ const NftIndex: NextPage = () => {
 
   const {
     data: listingInfoData,
-    isError: islistInfoError,
-    isLoading: isLoadingListInfo,
+    isError: isErrorListingInfo,
+    isLoading: isLoadingListingInfo,
   } = useContractRead({
     addressOrName: chainToContractAddress.get(Chain.polygon) as string,
     contractInterface: marketABI as any,
     functionName: 'getListInformation',
     args: getListInformationArgs,
-    chainId: 80001,
+    chainId: userConnectedChain?.id ?? 80001,
   })
   const listingInfo = listingInfoData as ListingInfo | undefined
   const sellerConnected = listingInfo && listingInfo[0] === address
 
+  const buyNFT = async () => {
+    setTransactionState(TransactionState.pending)
+    await new Promise((resolve) => {
+      setTimeout(resolve, 10 * 1000)
+    })
+    setTransactionState(TransactionState.complete)
+  }
   const modalInterior = (transactionState: TransactionState) => {
     switch (transactionState) {
       case TransactionState.notStarted:
         return (
           <ModalFooter>
-            <Button
-              colorScheme="blue"
-              mr={3}
-              onClick={async () => {
-                setTransactionState(TransactionState.pending)
-                await new Promise((resolve) => {
-                  setTimeout(resolve, 10 * 1000)
-                })
-                setTransactionState(TransactionState.complete)
-              }}
-            >
-              Buy NFT
+            <Button colorScheme="blue" mr={3} onClick={buyNFT}>
+              {userConnectedChain
+                ? `Buy NFT on ${userConnectedChain.name}`
+                : `Connect wallet to buy NFT`}
             </Button>
             <Button onClick={onClose}>Back</Button>
           </ModalFooter>
@@ -169,44 +176,73 @@ const NftIndex: NextPage = () => {
     }
   }
 
+  const nftData = (nft: Nft | null, isLoading: boolean) => {
+    if (isLoading) {
+      return <Spinner />
+    }
+
+    if (nft == null || isErrorFetchingMetadata) {
+      return (
+        <Text fontSize="lg">
+          Something went wrong while fetching nft metadata
+        </Text>
+      )
+    }
+
+    return (
+      <>
+        <Heading marginBottom={5}>{nft?.title}</Heading>
+        <Text fontSize="lg" marginBottom={2}>
+          {nft?.description}
+        </Text>
+        <Text fontSize="md">
+          {listedWithUs ? 'Listed on name placholder' : `Owned by ${nftOwner}`}
+        </Text>
+        <Img
+          src={image}
+          alt={nft?.title}
+          boxSize="sm"
+          marginBottom={10}
+          marginTop={10}
+        />
+        <Button onClick={onOpen}>Buy NFT</Button>
+      </>
+    )
+  }
+
+  const listingData = (
+    listingInfo: ListingInfo | undefined,
+    isLoading: boolean
+  ) => {
+    if (isLoading) {
+      return <Spinner />
+    }
+
+    if (listingInfo == null || isErrorListingInfo) {
+      return (
+        <Text fontSize="lg">
+          Something went wrong while fetching listing Info
+        </Text>
+      )
+    }
+
+    return (
+      <>
+        <Text fontSize="md">{`seller: ${listingInfo[0]}`}</Text>
+        <Text fontSize="md">{`price: ${formatEther(listingInfo[1])}`}</Text>
+        <Text fontSize="md">{`currencyId: ${listingInfo[2]}`}</Text>
+      </>
+    )
+  }
+
   return (
     <Layout>
       <Box>
-        {isLoadingMetadata ? (
-          <Spinner />
-        ) : (
-          <>
-            <Heading marginBottom={5}>{nft?.title}</Heading>
-            <Text fontSize="lg" marginBottom={2}>
-              {nft?.description}
-            </Text>
-            <Text fontSize="md">
-              {listedWithUs
-                ? 'Listed on name placholder'
-                : `Owned by ${nftOwner}`}
-            </Text>
-            <Img
-              src={image}
-              alt={nft?.title}
-              boxSize="sm"
-              marginBottom={10}
-              marginTop={10}
-            />
-            <Button onClick={onOpen}>Buy NFT</Button>
-          </>
-        )}
-        {listingInfo ? (
-          <>
-            <Text fontSize="md">{`seller: ${listingInfo[0]}`}</Text>
-            <Text fontSize="md">{`price: ${formatEther(listingInfo[1])}`}</Text>
-            <Text fontSize="md">{`currencyId: ${listingInfo[2]}`}</Text>
-          </>
-        ) : (
-          <Spinner />
-        )}
+        {nftData(nft, isLoadingMetadata)}
+        {listingData(listingInfo, isLoadingListingInfo)}
         <Box marginTop={10}>
           <div>{`current wallet address: ${address}`}</div>
-          <div>{`chain: ${chain}`}</div>
+          <div>{`listing chain: ${listingChain}`}</div>
           <div>{`contract address: ${contract}`}</div>
           <div>{`tokenId: ${tokenId}`}</div>
           <div>{`NFT seller currenctly connected: ${sellerConnected}`}</div>
