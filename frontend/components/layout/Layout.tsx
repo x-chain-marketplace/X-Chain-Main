@@ -1,11 +1,4 @@
-import {
-  Container,
-  Flex,
-  Image,
-  SimpleGrid,
-  Text,
-  createIcon,
-} from '@chakra-ui/react'
+import { Container, Flex, Image, SimpleGrid, Text } from '@chakra-ui/react'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import React from 'react'
 import { Head, MetaProps } from './Head'
