@@ -1728,11 +1728,6 @@
   resolved "https://registry.yarnpkg.com/@protobufjs/utf8/-/utf8-1.1.0.tgz#a777360b5b39a1a2e5106f8e858f2fd2d060c570"
   integrity sha512-Vvn3zZrhQZkkBE8LSuW3em98c0FwgO4nxzv6OdSxPKJIEKY2bGbHn+mhGIPerzI4twdxaP8/0+06HBpwf345Lw==
 
-"@rainbow-me/rainbowkit-siwe-next-auth@^0.1.4":
-  version "0.1.4"
-  resolved "https://registry.yarnpkg.com/@rainbow-me/rainbowkit-siwe-next-auth/-/rainbowkit-siwe-next-auth-0.1.4.tgz#b61416ac02c5896f53f2adfe7ca0c62418d1766e"
-  integrity sha512-wW4/yhMjYImaHWeg9CvZB/6ZbmwVA0BfDWmvqgG8yzkkxta4cGFA9glTqlq/+fsgAkXqdjBy7pYoidcIDpmTCA==
-
 "@rainbow-me/rainbowkit@^0.7.0":
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/@rainbow-me/rainbowkit/-/rainbowkit-0.7.0.tgz#984fe00df40f05320243c4be88c3d0dc01894973"
