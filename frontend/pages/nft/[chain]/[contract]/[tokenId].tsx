@@ -130,9 +130,7 @@ const NftIndex: NextPage = () => {
         return (
           <ModalFooter>
             <Button colorScheme="blue" mr={3} onClick={buyNFT}>
-              {userConnectedChain
-                ? `Buy NFT on ${userConnectedChain.name}`
-                : `Connect wallet to buy NFT`}
+              Buy NFT
             </Button>
             <Button onClick={onClose}>Back</Button>
           </ModalFooter>
@@ -205,7 +203,11 @@ const NftIndex: NextPage = () => {
           marginBottom={10}
           marginTop={10}
         />
-        <Button onClick={onOpen}>Buy NFT</Button>
+        <Button onClick={onOpen}>
+          {userConnectedChain
+            ? `Buy NFT on ${userConnectedChain.name}`
+            : `Connect wallet to buy NFT`}
+        </Button>
       </>
     )
   }
