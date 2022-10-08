@@ -17,7 +17,7 @@ async function main() {
   // fs.unlinkSync(`${config.paths.artifacts}/contracts/contractAddress.ts`);
 
   // We get the contract to deploy
-  const outboxAddress = "0xe17c37212d785760E8331D4A4395B17b34Ba8cDF";
+  const outboxAddress = "0xDDcFEcF17586D08A5740B7D91735fcCE3dfe3eeD";
   const MarketContract = await ethers.getContractFactory('Market');
   const market = await MarketContract.deploy(outboxAddress);
   await market.deployed();

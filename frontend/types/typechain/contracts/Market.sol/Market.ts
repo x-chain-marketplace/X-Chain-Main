@@ -30,31 +30,47 @@ import type {
 
 export interface MarketInterface extends utils.Interface {
   functions: {
-    "buy(uint32,address,address,uint256,address)": FunctionFragment;
+    "buy(uint32,address,address,uint256,address,uint32)": FunctionFragment;
+    "cancelListing(address,uint256)": FunctionFragment;
+    "currencyIdToChainlinkContract(uint32)": FunctionFragment;
     "domainToContractAddress(uint32)": FunctionFragment;
+    "getChainlinkContractAddress(uint32)": FunctionFragment;
+    "getPrice(uint32,address,uint256,address)": FunctionFragment;
     "getResisteredContract(uint32)": FunctionFragment;
     "handle(uint32,bytes32,bytes)": FunctionFragment;
-    "list(address,uint256,uint256,uint32,address)": FunctionFragment;
+    "list(address,uint256,uint256,uint32,uint32,address)": FunctionFragment;
+    "listedCurrency(bytes32)": FunctionFragment;
     "listedPrice(bytes32)": FunctionFragment;
     "outbox()": FunctionFragment;
     "owner()": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
+    "sellerAddress(bytes32)": FunctionFragment;
+    "setChainlinkContract(uint32,address)": FunctionFragment;
     "setContract(uint32,address)": FunctionFragment;
+    "testGetPriceMultiple(uint32,address,uint256,address,uint32,uint256)": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
   };
 
   getFunction(
     nameOrSignatureOrTopic:
       | "buy"
+      | "cancelListing"
+      | "currencyIdToChainlinkContract"
       | "domainToContractAddress"
+      | "getChainlinkContractAddress"
+      | "getPrice"
       | "getResisteredContract"
       | "handle"
       | "list"
+      | "listedCurrency"
       | "listedPrice"
       | "outbox"
       | "owner"
       | "renounceOwnership"
+      | "sellerAddress"
+      | "setChainlinkContract"
       | "setContract"
+      | "testGetPriceMultiple"
       | "transferOwnership"
   ): FunctionFragment;
 
@@ -65,12 +81,34 @@ export interface MarketInterface extends utils.Interface {
       PromiseOrValue<string>,
       PromiseOrValue<string>,
       PromiseOrValue<BigNumberish>,
-      PromiseOrValue<string>
+      PromiseOrValue<string>,
+      PromiseOrValue<BigNumberish>
     ]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "cancelListing",
+    values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "currencyIdToChainlinkContract",
+    values: [PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
     functionFragment: "domainToContractAddress",
     values: [PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getChainlinkContractAddress",
+    values: [PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getPrice",
+    values: [
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<string>,
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<string>
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "getResisteredContract",
@@ -91,8 +129,13 @@ export interface MarketInterface extends utils.Interface {
       PromiseOrValue<BigNumberish>,
       PromiseOrValue<BigNumberish>,
       PromiseOrValue<BigNumberish>,
+      PromiseOrValue<BigNumberish>,
       PromiseOrValue<string>
     ]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "listedCurrency",
+    values: [PromiseOrValue<BytesLike>]
   ): string;
   encodeFunctionData(
     functionFragment: "listedPrice",
@@ -105,8 +148,27 @@ export interface MarketInterface extends utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "sellerAddress",
+    values: [PromiseOrValue<BytesLike>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setChainlinkContract",
+    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
     functionFragment: "setContract",
     values: [PromiseOrValue<BigNumberish>, PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "testGetPriceMultiple",
+    values: [
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<string>,
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<string>,
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<BigNumberish>
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "transferOwnership",
@@ -115,15 +177,32 @@ export interface MarketInterface extends utils.Interface {
 
   decodeFunctionResult(functionFragment: "buy", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "cancelListing",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "currencyIdToChainlinkContract",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "domainToContractAddress",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "getChainlinkContractAddress",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "getPrice", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getResisteredContract",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "handle", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "list", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "listedCurrency",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "listedPrice",
     data: BytesLike
@@ -135,7 +214,19 @@ export interface MarketInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "sellerAddress",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setChainlinkContract",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "setContract",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "testGetPriceMultiple",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -225,13 +316,38 @@ export interface Market extends BaseContract {
       nftContractAddress: PromiseOrValue<string>,
       tokenId: PromiseOrValue<BigNumberish>,
       seller: PromiseOrValue<string>,
+      currencyId: PromiseOrValue<BigNumberish>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
+
+    cancelListing(
+      nftContractAddress: PromiseOrValue<string>,
+      tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    currencyIdToChainlinkContract(
+      arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
 
     domainToContractAddress(
       arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<[string]>;
+
+    getChainlinkContractAddress(
+      domainId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    getPrice(
+      domainId: PromiseOrValue<BigNumberish>,
+      nftContractAddress: PromiseOrValue<string>,
+      tokenId: PromiseOrValue<BigNumberish>,
+      seller: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
 
     getResisteredContract(
       domainId: PromiseOrValue<BigNumberish>,
@@ -249,10 +365,16 @@ export interface Market extends BaseContract {
       nftContractAddress: PromiseOrValue<string>,
       tokenId: PromiseOrValue<BigNumberish>,
       price: PromiseOrValue<BigNumberish>,
+      currencyId: PromiseOrValue<BigNumberish>,
       domainIdTo: PromiseOrValue<BigNumberish>,
       ourContractAddress: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
+
+    listedCurrency(
+      arg0: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
+    ): Promise<[number]>;
 
     listedPrice(
       arg0: PromiseOrValue<BytesLike>,
@@ -267,11 +389,32 @@ export interface Market extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
+    sellerAddress(
+      arg0: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    setChainlinkContract(
+      currencyId: PromiseOrValue<BigNumberish>,
+      contractAddress: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
     setContract(
       domainId: PromiseOrValue<BigNumberish>,
       contractAddress: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
+
+    testGetPriceMultiple(
+      domainId: PromiseOrValue<BigNumberish>,
+      nftContractAddress: PromiseOrValue<string>,
+      tokenId: PromiseOrValue<BigNumberish>,
+      seller: PromiseOrValue<string>,
+      currencyId: PromiseOrValue<BigNumberish>,
+      msgValue: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<[[BigNumber, BigNumber]]>;
 
     transferOwnership(
       newOwner: PromiseOrValue<string>,
@@ -285,13 +428,38 @@ export interface Market extends BaseContract {
     nftContractAddress: PromiseOrValue<string>,
     tokenId: PromiseOrValue<BigNumberish>,
     seller: PromiseOrValue<string>,
+    currencyId: PromiseOrValue<BigNumberish>,
     overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
+
+  cancelListing(
+    nftContractAddress: PromiseOrValue<string>,
+    tokenId: PromiseOrValue<BigNumberish>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  currencyIdToChainlinkContract(
+    arg0: PromiseOrValue<BigNumberish>,
+    overrides?: CallOverrides
+  ): Promise<string>;
 
   domainToContractAddress(
     arg0: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
   ): Promise<string>;
+
+  getChainlinkContractAddress(
+    domainId: PromiseOrValue<BigNumberish>,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
+  getPrice(
+    domainId: PromiseOrValue<BigNumberish>,
+    nftContractAddress: PromiseOrValue<string>,
+    tokenId: PromiseOrValue<BigNumberish>,
+    seller: PromiseOrValue<string>,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
 
   getResisteredContract(
     domainId: PromiseOrValue<BigNumberish>,
@@ -309,10 +477,16 @@ export interface Market extends BaseContract {
     nftContractAddress: PromiseOrValue<string>,
     tokenId: PromiseOrValue<BigNumberish>,
     price: PromiseOrValue<BigNumberish>,
+    currencyId: PromiseOrValue<BigNumberish>,
     domainIdTo: PromiseOrValue<BigNumberish>,
     ourContractAddress: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
+
+  listedCurrency(
+    arg0: PromiseOrValue<BytesLike>,
+    overrides?: CallOverrides
+  ): Promise<number>;
 
   listedPrice(
     arg0: PromiseOrValue<BytesLike>,
@@ -327,11 +501,32 @@ export interface Market extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
+  sellerAddress(
+    arg0: PromiseOrValue<BytesLike>,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
+  setChainlinkContract(
+    currencyId: PromiseOrValue<BigNumberish>,
+    contractAddress: PromiseOrValue<string>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   setContract(
     domainId: PromiseOrValue<BigNumberish>,
     contractAddress: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
+
+  testGetPriceMultiple(
+    domainId: PromiseOrValue<BigNumberish>,
+    nftContractAddress: PromiseOrValue<string>,
+    tokenId: PromiseOrValue<BigNumberish>,
+    seller: PromiseOrValue<string>,
+    currencyId: PromiseOrValue<BigNumberish>,
+    msgValue: PromiseOrValue<BigNumberish>,
+    overrides?: CallOverrides
+  ): Promise<[BigNumber, BigNumber]>;
 
   transferOwnership(
     newOwner: PromiseOrValue<string>,
@@ -345,13 +540,38 @@ export interface Market extends BaseContract {
       nftContractAddress: PromiseOrValue<string>,
       tokenId: PromiseOrValue<BigNumberish>,
       seller: PromiseOrValue<string>,
+      currencyId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    cancelListing(
+      nftContractAddress: PromiseOrValue<string>,
+      tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    currencyIdToChainlinkContract(
+      arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<string>;
 
     domainToContractAddress(
       arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<string>;
+
+    getChainlinkContractAddress(
+      domainId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    getPrice(
+      domainId: PromiseOrValue<BigNumberish>,
+      nftContractAddress: PromiseOrValue<string>,
+      tokenId: PromiseOrValue<BigNumberish>,
+      seller: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     getResisteredContract(
       domainId: PromiseOrValue<BigNumberish>,
@@ -369,10 +589,16 @@ export interface Market extends BaseContract {
       nftContractAddress: PromiseOrValue<string>,
       tokenId: PromiseOrValue<BigNumberish>,
       price: PromiseOrValue<BigNumberish>,
+      currencyId: PromiseOrValue<BigNumberish>,
       domainIdTo: PromiseOrValue<BigNumberish>,
       ourContractAddress: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    listedCurrency(
+      arg0: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
+    ): Promise<number>;
 
     listedPrice(
       arg0: PromiseOrValue<BytesLike>,
@@ -385,11 +611,32 @@ export interface Market extends BaseContract {
 
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
 
+    sellerAddress(
+      arg0: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    setChainlinkContract(
+      currencyId: PromiseOrValue<BigNumberish>,
+      contractAddress: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     setContract(
       domainId: PromiseOrValue<BigNumberish>,
       contractAddress: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    testGetPriceMultiple(
+      domainId: PromiseOrValue<BigNumberish>,
+      nftContractAddress: PromiseOrValue<string>,
+      tokenId: PromiseOrValue<BigNumberish>,
+      seller: PromiseOrValue<string>,
+      currencyId: PromiseOrValue<BigNumberish>,
+      msgValue: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber, BigNumber]>;
 
     transferOwnership(
       newOwner: PromiseOrValue<string>,
@@ -441,11 +688,36 @@ export interface Market extends BaseContract {
       nftContractAddress: PromiseOrValue<string>,
       tokenId: PromiseOrValue<BigNumberish>,
       seller: PromiseOrValue<string>,
+      currencyId: PromiseOrValue<BigNumberish>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    cancelListing(
+      nftContractAddress: PromiseOrValue<string>,
+      tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    currencyIdToChainlinkContract(
+      arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     domainToContractAddress(
       arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getChainlinkContractAddress(
+      domainId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getPrice(
+      domainId: PromiseOrValue<BigNumberish>,
+      nftContractAddress: PromiseOrValue<string>,
+      tokenId: PromiseOrValue<BigNumberish>,
+      seller: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -465,9 +737,15 @@ export interface Market extends BaseContract {
       nftContractAddress: PromiseOrValue<string>,
       tokenId: PromiseOrValue<BigNumberish>,
       price: PromiseOrValue<BigNumberish>,
+      currencyId: PromiseOrValue<BigNumberish>,
       domainIdTo: PromiseOrValue<BigNumberish>,
       ourContractAddress: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    listedCurrency(
+      arg0: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     listedPrice(
@@ -483,10 +761,31 @@ export interface Market extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
+    sellerAddress(
+      arg0: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    setChainlinkContract(
+      currencyId: PromiseOrValue<BigNumberish>,
+      contractAddress: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
     setContract(
       domainId: PromiseOrValue<BigNumberish>,
       contractAddress: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    testGetPriceMultiple(
+      domainId: PromiseOrValue<BigNumberish>,
+      nftContractAddress: PromiseOrValue<string>,
+      tokenId: PromiseOrValue<BigNumberish>,
+      seller: PromiseOrValue<string>,
+      currencyId: PromiseOrValue<BigNumberish>,
+      msgValue: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     transferOwnership(
@@ -502,11 +801,36 @@ export interface Market extends BaseContract {
       nftContractAddress: PromiseOrValue<string>,
       tokenId: PromiseOrValue<BigNumberish>,
       seller: PromiseOrValue<string>,
+      currencyId: PromiseOrValue<BigNumberish>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    cancelListing(
+      nftContractAddress: PromiseOrValue<string>,
+      tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    currencyIdToChainlinkContract(
+      arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     domainToContractAddress(
       arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getChainlinkContractAddress(
+      domainId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getPrice(
+      domainId: PromiseOrValue<BigNumberish>,
+      nftContractAddress: PromiseOrValue<string>,
+      tokenId: PromiseOrValue<BigNumberish>,
+      seller: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -526,9 +850,15 @@ export interface Market extends BaseContract {
       nftContractAddress: PromiseOrValue<string>,
       tokenId: PromiseOrValue<BigNumberish>,
       price: PromiseOrValue<BigNumberish>,
+      currencyId: PromiseOrValue<BigNumberish>,
       domainIdTo: PromiseOrValue<BigNumberish>,
       ourContractAddress: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    listedCurrency(
+      arg0: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     listedPrice(
@@ -544,10 +874,31 @@ export interface Market extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
+    sellerAddress(
+      arg0: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    setChainlinkContract(
+      currencyId: PromiseOrValue<BigNumberish>,
+      contractAddress: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
     setContract(
       domainId: PromiseOrValue<BigNumberish>,
       contractAddress: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    testGetPriceMultiple(
+      domainId: PromiseOrValue<BigNumberish>,
+      nftContractAddress: PromiseOrValue<string>,
+      tokenId: PromiseOrValue<BigNumberish>,
+      seller: PromiseOrValue<string>,
+      currencyId: PromiseOrValue<BigNumberish>,
+      msgValue: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     transferOwnership(
