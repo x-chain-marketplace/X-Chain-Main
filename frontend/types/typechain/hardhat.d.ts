@@ -57,6 +57,18 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC165__factory>;
     getContractFactory(
+      name: "IMessageRecipient",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IMessageRecipient__factory>;
+    getContractFactory(
+      name: "IOutbox",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IOutbox__factory>;
+    getContractFactory(
+      name: "Market",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.Market__factory>;
+    getContractFactory(
       name: "YourContract",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.YourContract__factory>;
@@ -120,6 +132,21 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.IERC165>;
+    getContractAt(
+      name: "IMessageRecipient",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IMessageRecipient>;
+    getContractAt(
+      name: "IOutbox",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IOutbox>;
+    getContractAt(
+      name: "Market",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.Market>;
     getContractAt(
       name: "YourContract",
       address: string,

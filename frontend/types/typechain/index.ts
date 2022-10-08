@@ -28,6 +28,12 @@ export type { ERC165 } from "./@openzeppelin/contracts/utils/introspection/ERC16
 export { ERC165__factory } from "./factories/@openzeppelin/contracts/utils/introspection/ERC165__factory";
 export type { IERC165 } from "./@openzeppelin/contracts/utils/introspection/IERC165";
 export { IERC165__factory } from "./factories/@openzeppelin/contracts/utils/introspection/IERC165__factory";
+export type { IMessageRecipient } from "./contracts/Market.sol/IMessageRecipient";
+export { IMessageRecipient__factory } from "./factories/contracts/Market.sol/IMessageRecipient__factory";
+export type { IOutbox } from "./contracts/Market.sol/IOutbox";
+export { IOutbox__factory } from "./factories/contracts/Market.sol/IOutbox__factory";
+export type { Market } from "./contracts/Market.sol/Market";
+export { Market__factory } from "./factories/contracts/Market.sol/Market__factory";
 export type { YourContract } from "./contracts/YourContract";
 export { YourContract__factory } from "./factories/contracts/YourContract__factory";
 export type { YourNFT } from "./contracts/YourNFT";
