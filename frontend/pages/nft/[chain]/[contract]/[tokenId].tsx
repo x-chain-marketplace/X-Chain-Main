@@ -6,13 +6,13 @@ import { useEffect, useState } from 'react'
 import { Layout } from '../../../../components/layout/Layout'
 import { Nft } from 'alchemy-sdk'
 import axios from 'axios'
+import { useAccount } from 'wagmi'
 
 const NftIndex: NextPage = () => {
   const router = useRouter()
   const { chain, contract, tokenId } = router.query
 
-  const { data: session } = useSession()
-  const address = session?.user?.name
+  const { address } = useAccount()
   const [nft, setNft] = useState<Nft | null>(null)
   const [isLoadingMetadata, setIsLoadingMetadata] = useState<boolean>(false)
 
@@ -37,7 +37,7 @@ const NftIndex: NextPage = () => {
   return (
     <Layout>
       <Box>
-        <div>{`address: ${address}`}</div>
+        <div>{`current wallet address: ${address}`}</div>
         <div>{`chain: ${chain}`}</div>
         <div>{`contract address: ${contract}`}</div>
         <div>{`tokenId: ${tokenId}`}</div>
