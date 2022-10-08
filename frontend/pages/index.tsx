@@ -43,7 +43,6 @@ const Home: NextPage = () => {
               pointerEvents="none"
               color="gray.300"
               fontSize="1.2em"
-              children="#"
             />
             <Input
               type="text"
@@ -57,7 +56,6 @@ const Home: NextPage = () => {
               pointerEvents="none"
               color="gray.300"
               fontSize="1.2em"
-              children="T"
             />
             <Input
               type="text"
