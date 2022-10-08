@@ -17,9 +17,20 @@ async function main() {
   // fs.unlinkSync(`${config.paths.artifacts}/contracts/contractAddress.ts`);
 
   // We get the contract to deploy
-  const outboxAddress = "0xDDcFEcF17586D08A5740B7D91735fcCE3dfe3eeD";
+  const goerliOutboxAddress = "0xDDcFEcF17586D08A5740B7D91735fcCE3dfe3eeD";
+  const mumbaiOutboxAddress = "0xe17c37212d785760E8331D4A4395B17b34Ba8cDF";
+  const moonbaseOutboxAddress = "0x54148470292C24345fb828B003461a9444414517";
+
+  const goerliDomain = "5";
+  const mumbaiDomain = "80001";
+  const moonbeamDomain = "0x6d6f2d61";
+
+
   const MarketContract = await ethers.getContractFactory('Market');
-  const market = await MarketContract.deploy(outboxAddress);
+  const market = await MarketContract.deploy(
+    moonbaseOutboxAddress,
+    moonbeamDomain
+  );
   await market.deployed();
   console.log("YourContract deployed to:", market.address);
 

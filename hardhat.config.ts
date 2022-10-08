@@ -3,7 +3,7 @@ import { HardhatUserConfig } from "hardhat/config";
 import {
   accounts,
   infuraId,
-  ethersanApiKey,
+  portalId,
   polygonscanApiKey,
 } from "./lib/env";
 
@@ -17,9 +17,29 @@ const config: HardhatUserConfig = {
     hardhat: {
       chainId: 1337, // We set 1337 to make interacting with MetaMask simpler
     },
+    ethereum: {
+      chainId: 1,
+      url: `https://eth-mainnet.gateway.pokt.network/v1/lb/${portalId}`,
+      accounts
+    },
     goerli: {
       chainId: 5,
-      url: `https://goerli.infura.io/v3/${infuraId}`,
+      url: `https://eth-goerli.gateway.pokt.network/v1/lb/${portalId}`,
+      accounts,
+    },
+    optimism: {
+      chainId: 10,
+      url: `https://optimism-mainnet.gateway.pokt.network/v1/lb/${portalId}`,
+      accounts,
+    },
+    polygon: {
+      chainId: 137,
+      url: `https://poly-mainnet.gateway.pokt.network/v1/lb/${portalId}`,
+      accounts,
+    },
+    moonbaseAlpha: {
+      chainId: 1287,
+      url: `https://rpc.api.moonbase.moonbeam.network`,
       accounts,
     },
     polygonMumbai: {
@@ -35,6 +55,7 @@ const config: HardhatUserConfig = {
     apiKey: {
       goerli: "Z1TKKCFKK9GTVJ3FZP3IA4K8SINX16NCJ3",
       polygonMumbai: "GZ6K1PAJV7YH2G2CZNG7RKYSURKXB3PFTA",
+      moonbaseAlpha: "J91J9C15UUQIZRVGQ6FYVBZW5219XEBYRE",
     },
   },
 };

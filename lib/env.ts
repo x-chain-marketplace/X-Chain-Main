@@ -9,3 +9,5 @@ export const accounts =
 export const infuraId = process.env.INFURA_API_KEY || "";
 export const ethersanApiKey = process.env.ETHERSCAN_API_KEY || "";
 export const polygonscanApiKey = process.env.POLYGONSCAN_API_KEY || "";
+export const moonscanApiKey = process.env.MOONSCAN_API_KEY || "";
+export const portalId = process.env.PORTAL_ID || "";

@@ -1,7 +1,7 @@
 {
   "ethereum": {
     "chainId": 1,
-    "rpc": "",
+    "rpc": "https://eth-mainnet.gateway.pokt.network/v1/lb/",
     "explore": "https://etherscan.io/",
     "outbox": "0x2f9DB5616fa3fAd1aB06cB2C906830BA63d135e3",
     "deployedContract": "",
@@ -12,7 +12,7 @@
     "rpc": "",
     "explore": "",
     "outbox": "0xDDcFEcF17586D08A5740B7D91735fcCE3dfe3eeD",
-    "deployedContract": "0x8049ad567CB4265a42213ec0ef939Cdb13E66595",
+    "deployedContract": "0x3bbF06ad0468F4883e3142A7c7dB6CaD12229cd1",
     "domain": "5"
   },
   "optimism": {
@@ -39,7 +39,7 @@
     "deployedContract": "",
     "domain": "0x706f6c79"
   },
-  "moonbase": {
+  "moonbaseAlpha": {
     "chainId": 1287,
     "rpc": "https://rpc.api.moonbase.moonbeam.network",
     "explore": "https://moonbase.moonscan.io/",
@@ -52,7 +52,7 @@
     "rpc": "https://matic-mumbai.chainstacklabs.com",
     "explore": "https://mumbai.polygonscan.com/",
     "outbox": "0xe17c37212d785760E8331D4A4395B17b34Ba8cDF",
-    "deployedContract": "0x615661184ef0D451F9F0110aF8F33950F668f0C5",
+    "deployedContract": "0xC885a10d858179140Bc48283217297910A8eE0Dd",
     "domain": "80001"
   }
 }
