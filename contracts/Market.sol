@@ -22,12 +22,14 @@ interface IMessageRecipient {
 }
 
 contract Market is IMessageRecipient, Ownable {
-  constructor(address _outbox) {
+  constructor(address _outbox, uint32 _selfDomainid) {
     outbox = _outbox;
+    selfDomainId = _selfDomainid;
   }
   AggregatorV3Interface internal priceFeed;
 
   address public outbox;
+  uint32 public selfDomainId;
   mapping(bytes32=>address) public sellerAddress;
   mapping(bytes32 => uint256) public listedPrice;
   mapping(bytes32 => uint32) public listedCurrency;
@@ -48,7 +50,10 @@ contract Market is IMessageRecipient, Ownable {
   }
 
   function setContract(uint32 domainId, address contractAddress) public onlyOwner {
-    domainToContractAddress[domainId] = addressToBytes32(contractAddress);
+    domainToContractAddress[domainId] = _addressToBytes32(contractAddress);
+  }
+  function setSelfDomainId(uint32 domainId) public onlyOwner {
+    selfDomainId = domainId;
   }
 
   function setChainlinkContract(uint32 currencyId, address contractAddress) public onlyOwner {
@@ -56,11 +61,12 @@ contract Market is IMessageRecipient, Ownable {
   }
 
   function getResisteredContract(uint32 domainId) public view returns(address) {
-    return bytes32ToAddress(domainToContractAddress[domainId]);
+    return _bytes32ToAddress(domainToContractAddress[domainId]);
   }
 
   function buy(uint32 domainId, address contractAddress, address nftContractAddress, uint256 tokenId, address payable seller, uint32 currencyId)public payable {
     bytes32 key = keccak256(abi.encodePacked(domainId, nftContractAddress, tokenId, seller));
+    require(listedPrice[key] != 0 || listedCurrency[key] != 0);
     if(currencyId == listedCurrency[key]){
     // Check transferred amount is match to the listedPrice
       require(listedPrice[key] <= msg.value);
@@ -68,6 +74,8 @@ contract Market is IMessageRecipient, Ownable {
 
     // Send message to the other chain 
       _sendMessage(domainId, contractAddress, abi.encode("Trading", nftContractAddress, tokenId, msg.sender, listedPrice[key], 0,0));
+      _clearListing(key);
+
     }else{
     // Multipy currency * price both listed and used payment
       address chainlinkContractAddress = currencyIdToChainlinkContract[currencyId];
@@ -78,19 +86,21 @@ contract Market is IMessageRecipient, Ownable {
       seller.transfer(msg.value);
       // Send message to the other chain 
       _sendMessage(domainId, contractAddress, abi.encode("Trading", nftContractAddress, tokenId, msg.sender, listedPrice[key], 0,0));
+      _clearListing(key);
     }
     emit Bought(nftContractAddress, tokenId, seller, listedPrice[key]);
   }
 
-
-
   function list(address nftContractAddress, uint256 tokenId, uint256 price, uint32 currencyId, uint32 domainIdTo, address ourContractAddress)public {
     // Transfer NFT to our contract
     IERC721(nftContractAddress).transferFrom(msg.sender, address(this), tokenId);
-    sellerAddress[keccak256(abi.encodePacked(nftContractAddress, tokenId))] = msg.sender;
+    sellerAddress[keccak256(abi.encodePacked(selfDomainId, nftContractAddress, tokenId))] = msg.sender;
 
     // Send Message via Hyperlane
     _sendMessage(domainIdTo, ourContractAddress, abi.encode("Listing", nftContractAddress, tokenId, msg.sender, price, currencyId));
+    bytes32 key = keccak256(abi.encodePacked(selfDomainId, nftContractAddress, tokenId, msg.sender));
+    listedPrice[key] = price;
+    listedCurrency[key] = currencyId;
 
     emit Listed(nftContractAddress, tokenId, msg.sender, price);
   }
@@ -102,30 +112,36 @@ contract Market is IMessageRecipient, Ownable {
     sellerAddress[key] == address(0);
   }
 
-
   function handle(uint32 _origin, bytes32 _sender, bytes calldata _messageBody) external override onlyResisterdContract(_origin, _sender) {
     // Branch, according to the message
     (string memory messageType, address nftContractAddress, uint256 tokenId, address messageSender, uint256 price, uint32 currencyId) = abi.decode(_messageBody, (string, address, uint256, address, uint256, uint32));
+    bytes32 key = keccak256(abi.encodePacked(_origin, nftContractAddress, tokenId, messageSender));
+    bytes32 sellerAddressKey = keccak256(abi.encodePacked(_origin, nftContractAddress, tokenId));
     // case Listing
     // Upgrade the mapping price
-    if (compareStrings(messageType, "Listing")) {
-        bytes32 key = keccak256(abi.encodePacked(_origin, nftContractAddress, tokenId, messageSender));
-        listedPrice[key] = price;
-        listedCurrency[key] = currencyId;
+    if (_compareStrings(messageType, "Listing")) {
+      sellerAddress[sellerAddressKey] = messageSender;
+      listedPrice[key] = price;
+      listedCurrency[key] = currencyId;
     }
 
     // case Selling
     // Transfer NFTs to the buyer 
-    if (compareStrings(messageType, "Trading")) {
+    if (_compareStrings(messageType, "Trading")) {
         IERC721(nftContractAddress).transferFrom(address(this),messageSender,tokenId);
-        sellerAddress[keccak256(abi.encodePacked(nftContractAddress, tokenId))] = address(0);
+        sellerAddress[keccak256(abi.encodePacked(selfDomainId, nftContractAddress, tokenId))] = address(0);
+        _clearListing(key);
     }
 
   }
 
-  function getPrice(uint32 domainId, address nftContractAddress, uint256 tokenId, address seller) public view returns(uint256){
-    bytes32 key = keccak256(abi.encodePacked(domainId, nftContractAddress, tokenId, seller));
-    return listedPrice[key];
+  function getListInformation(uint32 domainId, address nftContractAddress, uint256 tokenId)public view returns(address, uint256, uint32) {
+    bytes32 key = keccak256(abi.encodePacked(domainId, nftContractAddress, tokenId));
+    address seller = sellerAddress[key];
+    key = keccak256(abi.encodePacked(domainId, nftContractAddress, tokenId, seller));
+    uint256 price = listedPrice[key];
+    uint32 currencyId = listedCurrency[key];
+    return (seller, price, currencyId);
   }
 
   function getChainlinkContractAddress(uint32 domainId) public view returns(address){
@@ -133,19 +149,25 @@ contract Market is IMessageRecipient, Ownable {
   }
 
   function _sendMessage (uint32 _destinationDomain, address _receipient, bytes memory _callData) internal {
-    IOutbox(outbox).dispatch(_destinationDomain, addressToBytes32(_receipient), _callData);
+    IOutbox(outbox).dispatch(_destinationDomain, _addressToBytes32(_receipient), _callData);
   }
 
+  function _clearListing(bytes32 key)internal {
+    listedCurrency[key] = 0;
+    listedPrice[key] = 0;
+  }
 
-  function addressToBytes32(address _addr) internal pure returns (bytes32) {
+  // Not important internal functions
+
+  function _addressToBytes32(address _addr) internal pure returns (bytes32) {
     return bytes32(uint256(uint160(_addr)));
   }
 
-  function bytes32ToAddress(bytes32 _buf) internal pure returns (address) {
+  function _bytes32ToAddress(bytes32 _buf) internal pure returns (address) {
     return address(uint160(uint256(_buf)));
   }
 
-  function compareStrings(string memory a, string memory b) internal pure returns (bool) {
+  function _compareStrings(string memory a, string memory b) internal pure returns (bool) {
     return (keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b))));
   }
   
