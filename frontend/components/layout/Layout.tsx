@@ -74,7 +74,7 @@ export const Layout = ({ children, customMeta }: LayoutProps): JSX.Element => {
                 </defs>
                 </svg>
             </Icon>
-            <Text>HEllo World</Text>
+            <Text>Hello World</Text>
             </Flex>
             <Flex
               order={[-1, null, null, 2]}

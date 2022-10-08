@@ -107,8 +107,6 @@ const NftIndex: NextPage = () => {
     tokenId,
   ]
 
-  console.log(getListInformationArgs)
-
   const {
     data: listingInfoData,
     isError: isErrorListingInfo,
@@ -252,8 +250,8 @@ const NftIndex: NextPage = () => {
                     mb={4}
                     ml={5}
                     pr={5}
-                    src="wallet-icon.svg"
-                    fallbackSrc="wallet-icon.svg"
+                    src="/wallet-icon.svg"
+                    fallbackSrc="/wallet-icon.svg"
                     borderRadius="full"
                   />
                   <Flex flexDirection="column">
@@ -274,8 +272,8 @@ const NftIndex: NextPage = () => {
                     mb={4}
                     ml={5}
                     pr={5}
-                    src="chain-icon.svg"
-                    fallbackSrc="chain-icon.svg"
+                    src="/chain-icon.svg"
+                    fallbackSrc="/chain-icon.svg"
                   />
                   <Flex flexDirection="column">
                     <Text fontSize="xs">Chain:</Text>
@@ -291,8 +289,8 @@ const NftIndex: NextPage = () => {
                     mb={4}
                     ml={5}
                     pr={5}
-                    src="price-icon.svg"
-                    fallbackSrc="price-icon.svg"
+                    src="/price-icon.svg"
+                    fallbackSrc="/price-icon.svg"
                     borderRadius="full"
                   />
                   <Flex flexDirection="column">
