@@ -1,8 +1,13 @@
 import {
   Box,
   Button,
+  useColorMode,
+  Flex,
+  Grid,
+  GridItem,
   Heading,
   Img,
+  Image,
   Text,
   Modal,
   ModalBody,
@@ -11,10 +16,10 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Spacer,
   Spinner,
   useDisclosure,
   Link,
-  Flex,
 } from '@chakra-ui/react'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
@@ -63,6 +68,8 @@ const NftIndex: NextPage = () => {
   const [transactionState, setTransactionState] = useState<TransactionState>(
     TransactionState.notStarted
   )
+  const { colorMode, toggleColorMode } = useColorMode();
+  
   const { isOpen, onOpen, onClose } = useDisclosure()
   const listedWithUs =
     nftOwner != null &&
@@ -238,18 +245,123 @@ const NftIndex: NextPage = () => {
   }
 
   return (
+
     <Layout>
-      <Box>
-        {nftData(nft, isLoadingMetadata)}
-        {listingData(listingInfo, isLoadingListingInfo)}
-        <Box marginTop={10}>
-          <div>{`current wallet address: ${address}`}</div>
-          <div>{`listing chain: ${listingChain}`}</div>
-          <div>{`contract address: ${contract}`}</div>
-          <div>{`tokenId: ${tokenId}`}</div>
-          <div>{`NFT seller currenctly connected: ${sellerConnected}`}</div>
+    <Button onClick={toggleColorMode}  size={'sm'} variant='link'>
+      {colorMode === 'light' ? <Text> </Text> : <Text> </Text>}
+    </Button>
+
+    <Grid
+      h='500px'
+      templateRows='repeat(2, 1fr)'
+      templateColumns='repeat(2, 1fr)'
+      gap={4}
+      
+    >
+      <GridItem colSpan={1} bg='#170D27' borderRadius="xl" borderColor="#ffffff" border="5px" p="10">
+        <Box>
+          {isLoadingMetadata ? (
+            <Spinner />
+          ) : (
+            <>           
+            <Img
+              src={image}
+              alt={nft?.title}
+              boxSize="lg"
+              borderRadius="xl"
+              mx="auto"
+              marginBottom={5}
+              objectFit='cover'
+            />
+            <div>
+              <Flex flexDirection="column">
+                <Text fontSize="xs">Contract Address:</Text>
+                <Text fontSize="xl">{`${contract}`}</Text>
+              </Flex>
+            </div>
+
+            <div>
+              <Flex flexDirection="column">
+                <Text fontSize="xs">TokenId:</Text>
+                <Text fontSize="xl">{`${tokenId}`}</Text>
+              </Flex>
+            </div>
+            </>
+          )}
         </Box>
+      </GridItem>
+      <GridItem colSpan={1} bg='#170D27' borderRadius="xl" borderColor="#ffffff" border="5px" p="10">
+
+      <Box>
+        {isLoadingMetadata ? (
+          <Spinner />
+        ) : (
+          <>
+            <Heading marginBottom={5}>{nft?.title}</Heading>
+            <Text fontSize="lg">{nft?.description}</Text>
+            {/* <Button onClick={onOpen}>Buy NFT</Button> */}
+            <Box marginTop={10}>
+              <div>
+                <Flex>
+                  <Image
+                      mb={4}
+                      ml={5}
+                      pr={5}
+                      src='wallet-icon.svg'
+                      fallbackSrc='wallet-icon.svg'
+                      borderRadius='full'
+                  /> 
+                  <Flex flexDirection="column">
+                    <Text fontSize="xs">Owner:</Text>
+                    <Text fontSize="xl" as='b' maxWidth="350px" noOfLines="1" textTransform="uppercase">{`${address}`}</Text>
+                    
+                  </Flex>
+                </Flex>
+              </div>
+              <div>
+                <Flex>
+                  <Image
+                      mb={4}
+                      ml={5}
+                      pr={5}
+                      src='chain-icon.svg'
+                      fallbackSrc='chain-icon.svg'
+                  /> 
+                  <Flex flexDirection="column">
+                    <Text fontSize="xs">Chain:</Text>
+                    <Text fontSize="xl" as='b'>Hi</Text>
+                    
+                  </Flex>
+                </Flex>
+              </div>
+              <div>
+                <Flex>
+                  <Image
+                      mb={4}
+                      ml={5}
+                      pr={5}
+                      src='price-icon.svg'
+                      fallbackSrc='price-icon.svg'
+                      borderRadius='full'
+                  /> 
+                  <Flex flexDirection="column">
+                    <Text fontSize="xs">Price:</Text>
+                    <Text fontSize="xl" as='b'>Add Price</Text>
+                    
+                  </Flex>
+                </Flex>
+              </div>
+            </Box>
+            <Box>
+              <Button onClick={onOpen}>Buy NFT</Button>
+            </Box>
+            </>
+          )}
       </Box>
+
+      </GridItem>
+    </Grid>
+
       <Modal closeOnOverlayClick={false} isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
