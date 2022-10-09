@@ -209,7 +209,7 @@ const NftIndex: NextPage = () => {
             <Text fontSize="32px" color="#000" marginBottom={5}>
               Yay Everything Worked!
             </Text>
-            <Link fontSize="md" textUnderline="none" href={explorerUrl}>
+            <Link fontSize="md" href={explorerUrl}>
               <Button
                 background="#FF6600"
                 mr={3}
