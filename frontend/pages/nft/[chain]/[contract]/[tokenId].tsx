@@ -19,6 +19,10 @@ import {
   Spinner,
   useDisclosure,
   Link,
+  Stat,
+  StatLabel,
+  StatNumber,
+  StatHelpText,
 } from '@chakra-ui/react'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
@@ -59,6 +63,7 @@ enum TransactionState {
   notStarted = 'notStarted',
 }
 
+// sellerAddress, price, currencyId
 type ListingInfo = [string, BigNumber, string]
 
 const NftIndex: NextPage = () => {
@@ -436,7 +441,23 @@ const NftIndex: NextPage = () => {
         <ModalContent>
           <ModalHeader>Transaction Summary</ModalHeader>
           <ModalCloseButton />
-          <ModalBody pb={6}>Insightful Transaction Summary</ModalBody>
+          <ModalBody pb={6}>
+            <Flex justifyContent="space-between">
+              <Stat>
+                <StatLabel>You're paying</StatLabel>
+                <StatNumber>{`${listingInfo && formatEther(listingInfo[1])} ${
+                  userConnectedChain?.nativeCurrency?.name
+                }`}</StatNumber>
+                <StatHelpText>{`on ${userConnectedChain?.name} chain`}</StatHelpText>
+              </Stat>
+              <Stat>
+                <StatLabel>You're recieving</StatLabel>
+                <StatNumber>{nft?.title}</StatNumber>
+                <Img boxSize="xs" src={image} />
+                <StatHelpText>{`on ${listingChain} chain`}</StatHelpText>
+              </Stat>
+            </Flex>
+          </ModalBody>
           {modalInterior(transactionState)};
         </ModalContent>
       </Modal>
