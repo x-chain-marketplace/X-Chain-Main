@@ -527,10 +527,10 @@ const NftIndex: NextPage = () => {
                         fallbackSrc="/price-icon.svg"
                       />
                       <Flex flexDirection="column">
-                        <Text color="#000" fontSize="xs" color="#fff">
+                        <Text fontSize="xs" color="#fff">
                           Price:
                         </Text>
-                        <Text color="#000" fontSize="xl" as="b" color="#fff">
+                        <Text fontSize="xl" as="b" color="#fff">
                           <StatNumber>{`${
                             listingInfo && formatEther(listingInfo[1])
                           } ${
@@ -550,10 +550,10 @@ const NftIndex: NextPage = () => {
                         fallbackSrc="/chain-icon.svg"
                       />
                       <Flex flexDirection="column">
-                        <Text color="#000" fontSize="xs" color="#fff">
+                        <Text fontSize="xs" color="#fff">
                           Chain:
                         </Text>
-                        <Text color="#000" fontSize="xl" as="b" color="#fff">
+                        <Text fontSize="xl" as="b" color="#fff">
                           {userConnectedChain?.name}
                         </Text>
                       </Flex>
