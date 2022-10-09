@@ -53,7 +53,7 @@ export default function useMarketContract(
     args: buyArgs,
     chainId: userConnectedChain?.id ?? 80001,
     enabled: listingInfo != null,
-    overrides: { value: parseEther('0.5') },
+    overrides: { value: parseEther('0.2') },
   })
   console.log('buy config')
   console.log(buyConfig)

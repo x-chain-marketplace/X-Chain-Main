@@ -1,13 +1,64 @@
-import { Box, Button, Img, Text } from '@chakra-ui/react'
+import { Box, Button, Img, Text, useToast } from '@chakra-ui/react'
 import type { NextPage } from 'next'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 import { Layout } from '../components/layout/Layout'
+import * as PushAPI from '@pushprotocol/restapi'
+import { useEffect, useState } from 'react'
+
+const waitForNewNotification = async () => {
+  let notifications = await PushAPI.user.getFeeds({
+    user: 'eip155:42:0xE898BBd704CCE799e9593a9ADe2c1cA0351Ab660', // user address in CAIP
+    env: 'staging',
+  })
+  const initialLength = notifications.length
+
+  while (notifications.length === initialLength) {
+    await new Promise((resolve) => setTimeout(resolve, 5000))
+    notifications = await PushAPI.user.getFeeds({
+      user: 'eip155:42:0xE898BBd704CCE799e9593a9ADe2c1cA0351Ab660', // user address in CAIP
+      env: 'staging',
+    })
+  }
+
+  console.log('New notification arrived')
+  return notifications[notifications.length - 1]
+}
 
 const Done: NextPage = () => {
   const router = useRouter()
+  const toast = useToast()
   const { message, assetLink } = router.query
+  const [newNotification, setNewNotification] = useState<null | any>(null)
+
+  useEffect(() => {
+    const wait = async () => {
+      const newNotif = await waitForNewNotification()
+      setNewNotification(newNotif)
+    }
+
+    wait()
+  }, [])
+
+  useEffect(() => {
+    if (newNotification == null) {
+      return
+    } 
+
+    toast({
+      render: () => (
+        <Box color='white' display="flex" alignItems="center" mx="auto" textAlign="center" width="500px" p={5} bg='#ffffff99' borderRadius="xl">
+          <Img
+            display="flex"
+            mr="20px"
+            src="/push.png"
+          />
+          <Text fontSize="22px" textAlign="left" fontWeight="600" color="#000" justifyContent="center">{`New Notification : ${newNotification?.message}`}</Text>
+        </Box>
+      ),
+    })
+  }, [newNotification])
 
   return (
     <Layout>

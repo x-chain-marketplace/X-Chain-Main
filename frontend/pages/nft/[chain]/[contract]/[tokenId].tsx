@@ -143,7 +143,8 @@ const NftIndex: NextPage = () => {
         const params = new URLSearchParams({
           message: 'Asset listed for sale!',
         })
-        //router.push(`/done?${params.toString()}`)
+        await new Promise((resolve) => setInterval(resolve, 2000))
+        router.push(`/done?${params.toString()}`)
       }
     : async () => {
         await buyNFT()
@@ -151,7 +152,8 @@ const NftIndex: NextPage = () => {
           message: 'Purchase Successful',
           assetLink: 'mock this',
         })
-        //router.push(`/done?${params.toString()}`)
+        await new Promise((resolve) => setInterval(resolve, 2000))
+        router.push(`/done?${params.toString()}`)
       }
 
   const modalInterior = (txnState: TransactionState) => {
