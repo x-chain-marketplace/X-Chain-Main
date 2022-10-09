@@ -214,7 +214,7 @@ const NftIndex: NextPage = () => {
             marginBottom={10}
             marginTop={10}
           >
-            <Text marginBottom={5}>Yay everything worked</Text>
+            <Text color="ffffff" marginBottom={5}>Yay everything worked</Text>
             <Link
               fontSize="md"
               href="https://etherscan.io/tx/0x077b71c0517104c8a47fd6eb3415c436a472bfe77322dcd6c0de561b358317f9"
@@ -235,7 +235,7 @@ const NftIndex: NextPage = () => {
 
     if (nft == null || isErrorFetchingMetadata) {
       return (
-        <Text fontSize="lg">
+        <Text color="#ffffff" fontSize="lg">
           Something went wrong while fetching nft metadata
         </Text>
       )
@@ -254,15 +254,15 @@ const NftIndex: NextPage = () => {
         />
         <div>
           <Flex flexDirection="column">
-            <Text fontSize="xs">Contract Address:</Text>
-            <Text fontSize="xl">{`${contract}`}</Text>
+            <Text color="#ffffff" fontSize="xs">Contract Address:</Text>
+            <Text color="#ffffff" fontSize="xl">{`${contract}`}</Text>
           </Flex>
         </div>
 
         <div>
           <Flex flexDirection="column">
-            <Text fontSize="xs">TokenId:</Text>
-            <Text fontSize="xl">{`${tokenId}`}</Text>
+            <Text color="#ffffff" mt="3" fontSize="xs">TokenId:</Text>
+            <Text color="#ffffff" fontSize="xl">{`${tokenId}`}</Text>
           </Flex>
         </div>
       </Box>
@@ -279,7 +279,7 @@ const NftIndex: NextPage = () => {
 
     if (listingInfo == null || isErrorListingInfo) {
       return (
-        <Text fontSize="lg">
+        <Text color="#ffffff" fontSize="lg">
           Something went wrong while fetching listing Info
         </Text>
       )
@@ -291,8 +291,8 @@ const NftIndex: NextPage = () => {
           <Spinner />
         ) : (
           <>
-            <Heading marginBottom={5}>{nft?.title}</Heading>
-            <Text fontSize="lg">{nft?.description}</Text>
+            <Heading color="#ffffff" marginBottom={5}>{nft?.title}</Heading>
+            <Text color="#ffffff" fontSize="lg">{nft?.description}</Text>
             <Box marginTop={10}>
               <div>
                 <Flex>
@@ -305,11 +305,12 @@ const NftIndex: NextPage = () => {
                     borderRadius="full"
                   />
                   <Flex flexDirection="column">
-                    <Text fontSize="xs">Owner:</Text>
+                    <Text color="#ffffff" fontSize="xs">Owner:</Text>
                     <Text
                       fontSize="xl"
                       as="b"
                       maxWidth="350px"
+                      color="#ffffff"
                       noOfLines={1}
                       textTransform="uppercase"
                     >{`${address}`}</Text>
@@ -326,8 +327,8 @@ const NftIndex: NextPage = () => {
                     fallbackSrc="/chain-icon.svg"
                   />
                   <Flex flexDirection="column">
-                    <Text fontSize="xs">Chain:</Text>
-                    <Text fontSize="xl" as="b">
+                    <Text color="#ffffff" fontSize="xs">Chain:</Text>
+                    <Text fontSize="xl" as="b" color="#ffffff">
                       {listingChain}
                     </Text>
                   </Flex>
@@ -344,8 +345,8 @@ const NftIndex: NextPage = () => {
                     borderRadius="full"
                   />
                   <Flex flexDirection="column">
-                    <Text fontSize="xs">Price:</Text>
-                    <Text fontSize="xl" as="b">
+                    <Text color="#ffffff" fontSize="xs">Price:</Text>
+                    <Text color="#ffffff" fontSize="xl" as="b">
                       {formatEther(listingInfo[1])}
                     </Text>
                   </Flex>
