@@ -31,7 +31,6 @@ import type {
 export interface MarketInterface extends utils.Interface {
   functions: {
     "buy(uint32,address,address,uint256,address,uint32)": FunctionFragment;
-    "buyWithERC20(uint32,address,address,uint256,address,uint32,uint256)": FunctionFragment;
     "cancelListing(address,uint256)": FunctionFragment;
     "currencyIdToChainlinkContract(uint32)": FunctionFragment;
     "currencyIdToCurrencyContractAddress(uint32)": FunctionFragment;
@@ -46,25 +45,19 @@ export interface MarketInterface extends utils.Interface {
     "outbox()": FunctionFragment;
     "owner()": FunctionFragment;
     "paidPrice(bytes32)": FunctionFragment;
-    "pushChannelAddress()": FunctionFragment;
-    "pushCommContractAddress()": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
     "selfDomainId()": FunctionFragment;
     "sellerAddress(bytes32)": FunctionFragment;
     "setChainlinkContract(uint32,address)": FunctionFragment;
     "setContract(uint32,address)": FunctionFragment;
     "setCurrencyContractAddress(uint32,address)": FunctionFragment;
-    "setPushChannelAddress(address)": FunctionFragment;
-    "setPushCommContractAddress(address)": FunctionFragment;
     "setSelfDomainId(uint32)": FunctionFragment;
-    "testGetPriceMultiple(uint32,address,uint256,address,uint32,uint256)": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
   };
 
   getFunction(
     nameOrSignatureOrTopic:
       | "buy"
-      | "buyWithERC20"
       | "cancelListing"
       | "currencyIdToChainlinkContract"
       | "currencyIdToCurrencyContractAddress"
@@ -79,18 +72,13 @@ export interface MarketInterface extends utils.Interface {
       | "outbox"
       | "owner"
       | "paidPrice"
-      | "pushChannelAddress"
-      | "pushCommContractAddress"
       | "renounceOwnership"
       | "selfDomainId"
       | "sellerAddress"
       | "setChainlinkContract"
       | "setContract"
       | "setCurrencyContractAddress"
-      | "setPushChannelAddress"
-      | "setPushCommContractAddress"
       | "setSelfDomainId"
-      | "testGetPriceMultiple"
       | "transferOwnership"
   ): FunctionFragment;
 
@@ -102,18 +90,6 @@ export interface MarketInterface extends utils.Interface {
       PromiseOrValue<string>,
       PromiseOrValue<BigNumberish>,
       PromiseOrValue<string>,
-      PromiseOrValue<BigNumberish>
-    ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "buyWithERC20",
-    values: [
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<string>,
-      PromiseOrValue<string>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<string>,
-      PromiseOrValue<BigNumberish>,
       PromiseOrValue<BigNumberish>
     ]
   ): string;
@@ -183,14 +159,6 @@ export interface MarketInterface extends utils.Interface {
     values: [PromiseOrValue<BytesLike>]
   ): string;
   encodeFunctionData(
-    functionFragment: "pushChannelAddress",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "pushCommContractAddress",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "renounceOwnership",
     values?: undefined
   ): string;
@@ -215,27 +183,8 @@ export interface MarketInterface extends utils.Interface {
     values: [PromiseOrValue<BigNumberish>, PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
-    functionFragment: "setPushChannelAddress",
-    values: [PromiseOrValue<string>]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setPushCommContractAddress",
-    values: [PromiseOrValue<string>]
-  ): string;
-  encodeFunctionData(
     functionFragment: "setSelfDomainId",
     values: [PromiseOrValue<BigNumberish>]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "testGetPriceMultiple",
-    values: [
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<string>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<string>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>
-    ]
   ): string;
   encodeFunctionData(
     functionFragment: "transferOwnership",
@@ -243,10 +192,6 @@ export interface MarketInterface extends utils.Interface {
   ): string;
 
   decodeFunctionResult(functionFragment: "buy", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "buyWithERC20",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "cancelListing",
     data: BytesLike
@@ -289,14 +234,6 @@ export interface MarketInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "paidPrice", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "pushChannelAddress",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "pushCommContractAddress",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "renounceOwnership",
     data: BytesLike
   ): Result;
@@ -321,19 +258,7 @@ export interface MarketInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "setPushChannelAddress",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setPushCommContractAddress",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "setSelfDomainId",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "testGetPriceMultiple",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -427,17 +352,6 @@ export interface Market extends BaseContract {
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
-    buyWithERC20(
-      domainId: PromiseOrValue<BigNumberish>,
-      contractAddress: PromiseOrValue<string>,
-      nftContractAddress: PromiseOrValue<string>,
-      tokenId: PromiseOrValue<BigNumberish>,
-      seller: PromiseOrValue<string>,
-      currencyId: PromiseOrValue<BigNumberish>,
-      sendPrice: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
     cancelListing(
       nftContractAddress: PromiseOrValue<string>,
       tokenId: PromiseOrValue<BigNumberish>,
@@ -512,10 +426,6 @@ export interface Market extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    pushChannelAddress(overrides?: CallOverrides): Promise<[string]>;
-
-    pushCommContractAddress(overrides?: CallOverrides): Promise<[string]>;
-
     renounceOwnership(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
@@ -545,30 +455,10 @@ export interface Market extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
-    setPushChannelAddress(
-      _address: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    setPushCommContractAddress(
-      _contractAddress: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
     setSelfDomainId(
       domainId: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
-
-    testGetPriceMultiple(
-      domainId: PromiseOrValue<BigNumberish>,
-      nftContractAddress: PromiseOrValue<string>,
-      tokenId: PromiseOrValue<BigNumberish>,
-      seller: PromiseOrValue<string>,
-      currencyId: PromiseOrValue<BigNumberish>,
-      msgValue: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<[[BigNumber, BigNumber]]>;
 
     transferOwnership(
       newOwner: PromiseOrValue<string>,
@@ -584,17 +474,6 @@ export interface Market extends BaseContract {
     seller: PromiseOrValue<string>,
     currencyId: PromiseOrValue<BigNumberish>,
     overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  buyWithERC20(
-    domainId: PromiseOrValue<BigNumberish>,
-    contractAddress: PromiseOrValue<string>,
-    nftContractAddress: PromiseOrValue<string>,
-    tokenId: PromiseOrValue<BigNumberish>,
-    seller: PromiseOrValue<string>,
-    currencyId: PromiseOrValue<BigNumberish>,
-    sendPrice: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
   cancelListing(
@@ -671,10 +550,6 @@ export interface Market extends BaseContract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  pushChannelAddress(overrides?: CallOverrides): Promise<string>;
-
-  pushCommContractAddress(overrides?: CallOverrides): Promise<string>;
-
   renounceOwnership(
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
@@ -704,30 +579,10 @@ export interface Market extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
-  setPushChannelAddress(
-    _address: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  setPushCommContractAddress(
-    _contractAddress: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
   setSelfDomainId(
     domainId: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
-
-  testGetPriceMultiple(
-    domainId: PromiseOrValue<BigNumberish>,
-    nftContractAddress: PromiseOrValue<string>,
-    tokenId: PromiseOrValue<BigNumberish>,
-    seller: PromiseOrValue<string>,
-    currencyId: PromiseOrValue<BigNumberish>,
-    msgValue: PromiseOrValue<BigNumberish>,
-    overrides?: CallOverrides
-  ): Promise<[BigNumber, BigNumber]>;
 
   transferOwnership(
     newOwner: PromiseOrValue<string>,
@@ -742,17 +597,6 @@ export interface Market extends BaseContract {
       tokenId: PromiseOrValue<BigNumberish>,
       seller: PromiseOrValue<string>,
       currencyId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    buyWithERC20(
-      domainId: PromiseOrValue<BigNumberish>,
-      contractAddress: PromiseOrValue<string>,
-      nftContractAddress: PromiseOrValue<string>,
-      tokenId: PromiseOrValue<BigNumberish>,
-      seller: PromiseOrValue<string>,
-      currencyId: PromiseOrValue<BigNumberish>,
-      sendPrice: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -830,10 +674,6 @@ export interface Market extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    pushChannelAddress(overrides?: CallOverrides): Promise<string>;
-
-    pushCommContractAddress(overrides?: CallOverrides): Promise<string>;
-
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
 
     selfDomainId(overrides?: CallOverrides): Promise<number>;
@@ -861,30 +701,10 @@ export interface Market extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    setPushChannelAddress(
-      _address: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setPushCommContractAddress(
-      _contractAddress: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     setSelfDomainId(
       domainId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>;
-
-    testGetPriceMultiple(
-      domainId: PromiseOrValue<BigNumberish>,
-      nftContractAddress: PromiseOrValue<string>,
-      tokenId: PromiseOrValue<BigNumberish>,
-      seller: PromiseOrValue<string>,
-      currencyId: PromiseOrValue<BigNumberish>,
-      msgValue: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber, BigNumber]>;
 
     transferOwnership(
       newOwner: PromiseOrValue<string>,
@@ -938,17 +758,6 @@ export interface Market extends BaseContract {
       seller: PromiseOrValue<string>,
       currencyId: PromiseOrValue<BigNumberish>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    buyWithERC20(
-      domainId: PromiseOrValue<BigNumberish>,
-      contractAddress: PromiseOrValue<string>,
-      nftContractAddress: PromiseOrValue<string>,
-      tokenId: PromiseOrValue<BigNumberish>,
-      seller: PromiseOrValue<string>,
-      currencyId: PromiseOrValue<BigNumberish>,
-      sendPrice: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
     cancelListing(
@@ -1025,10 +834,6 @@ export interface Market extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    pushChannelAddress(overrides?: CallOverrides): Promise<BigNumber>;
-
-    pushCommContractAddress(overrides?: CallOverrides): Promise<BigNumber>;
-
     renounceOwnership(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
@@ -1058,29 +863,9 @@ export interface Market extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
-    setPushChannelAddress(
-      _address: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    setPushCommContractAddress(
-      _contractAddress: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
     setSelfDomainId(
       domainId: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    testGetPriceMultiple(
-      domainId: PromiseOrValue<BigNumberish>,
-      nftContractAddress: PromiseOrValue<string>,
-      tokenId: PromiseOrValue<BigNumberish>,
-      seller: PromiseOrValue<string>,
-      currencyId: PromiseOrValue<BigNumberish>,
-      msgValue: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     transferOwnership(
@@ -1098,17 +883,6 @@ export interface Market extends BaseContract {
       seller: PromiseOrValue<string>,
       currencyId: PromiseOrValue<BigNumberish>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    buyWithERC20(
-      domainId: PromiseOrValue<BigNumberish>,
-      contractAddress: PromiseOrValue<string>,
-      nftContractAddress: PromiseOrValue<string>,
-      tokenId: PromiseOrValue<BigNumberish>,
-      seller: PromiseOrValue<string>,
-      currencyId: PromiseOrValue<BigNumberish>,
-      sendPrice: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     cancelListing(
@@ -1185,14 +959,6 @@ export interface Market extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    pushChannelAddress(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    pushCommContractAddress(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     renounceOwnership(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
@@ -1222,29 +988,9 @@ export interface Market extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
-    setPushChannelAddress(
-      _address: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    setPushCommContractAddress(
-      _contractAddress: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
     setSelfDomainId(
       domainId: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    testGetPriceMultiple(
-      domainId: PromiseOrValue<BigNumberish>,
-      nftContractAddress: PromiseOrValue<string>,
-      tokenId: PromiseOrValue<BigNumberish>,
-      seller: PromiseOrValue<string>,
-      currencyId: PromiseOrValue<BigNumberish>,
-      msgValue: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     transferOwnership(

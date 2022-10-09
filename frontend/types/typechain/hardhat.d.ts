@@ -41,10 +41,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IOutbox__factory>;
     getContractFactory(
-      name: "IPUSHCommInterface",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IPUSHCommInterface__factory>;
-    getContractFactory(
       name: "Market",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Market__factory>;
@@ -84,11 +80,6 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.IOutbox>;
-    getContractAt(
-      name: "IPUSHCommInterface",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.IPUSHCommInterface>;
     getContractAt(
       name: "Market",
       address: string,

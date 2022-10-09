@@ -22,7 +22,5 @@ export type { IMessageRecipient } from "./contracts/Market.sol/IMessageRecipient
 export { IMessageRecipient__factory } from "./factories/contracts/Market.sol/IMessageRecipient__factory";
 export type { IOutbox } from "./contracts/Market.sol/IOutbox";
 export { IOutbox__factory } from "./factories/contracts/Market.sol/IOutbox__factory";
-export type { IPUSHCommInterface } from "./contracts/Market.sol/IPUSHCommInterface";
-export { IPUSHCommInterface__factory } from "./factories/contracts/Market.sol/IPUSHCommInterface__factory";
 export type { Market } from "./contracts/Market.sol/Market";
 export { Market__factory } from "./factories/contracts/Market.sol/Market__factory";

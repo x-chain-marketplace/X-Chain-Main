@@ -3,5 +3,4 @@
 /* eslint-disable */
 export type { IMessageRecipient } from "./IMessageRecipient";
 export type { IOutbox } from "./IOutbox";
-export type { IPUSHCommInterface } from "./IPUSHCommInterface";
 export type { Market } from "./Market";

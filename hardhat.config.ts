@@ -20,14 +20,14 @@ const config: HardhatUserConfig = {
     ethereum: {
       chainId: 1,
       url: `https://eth-mainnet.gateway.pokt.network/v1/lb/${portalId}`,
-      accounts
+      accounts,
     },
     goerli: {
       chainId: 5,
       url: `https://eth-goerli.gateway.pokt.network/v1/lb/${portalId}`,
       accounts,
     },
-    optimism: {
+    optimisticEthereum: {
       chainId: 10,
       url: `https://optimism-mainnet.gateway.pokt.network/v1/lb/${portalId}`,
       accounts,
@@ -55,7 +55,9 @@ const config: HardhatUserConfig = {
     apiKey: {
       goerli: "Z1TKKCFKK9GTVJ3FZP3IA4K8SINX16NCJ3",
       polygonMumbai: "GZ6K1PAJV7YH2G2CZNG7RKYSURKXB3PFTA",
+      polygon: "GZ6K1PAJV7YH2G2CZNG7RKYSURKXB3PFTA",
       moonbaseAlpha: "J91J9C15UUQIZRVGQ6FYVBZW5219XEBYRE",
+      optimisticEthereum: "62F9T62NRZXPYIMWSPE4Y6PYE4MKMMGXUZ",
     },
   },
 };

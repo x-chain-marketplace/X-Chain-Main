@@ -20,10 +20,14 @@ async function main() {
   const goerliOutboxAddress = "0xDDcFEcF17586D08A5740B7D91735fcCE3dfe3eeD";
   const mumbaiOutboxAddress = "0xe17c37212d785760E8331D4A4395B17b34Ba8cDF";
   const moonbaseOutboxAddress = "0x54148470292C24345fb828B003461a9444414517";
+  const optimismOutboxAddress = "0x0be2Ae2f6D02a3e0e00ECB57D3E1fCbb7f8F38F4";
+  const polygonOutboxAddress = "0x8249cD1275855F2BB20eE71f0B9fA3c9155E5FaB";
 
   const goerliDomain = "5";
   const mumbaiDomain = "80001";
   const moonbaseDomain = "0x6d6f2d61";
+  const optimismDomain = "0x6f70";
+  const polygonDomain = "0x706f6c79";
 
   const goerliPushCommContractAddress =
     "0xb3971bcef2d791bc4027bbfedfb47319a4aaaaaa";
@@ -37,10 +41,8 @@ async function main() {
 
   const MarketContract = await ethers.getContractFactory('Market');
   const market = await MarketContract.deploy(
-    moonbaseOutboxAddress,
-    moonbaseDomain,
-    zeroaddress,
-    zeroaddress
+    polygonOutboxAddress,
+    polygonDomain
   );
   await market.deployed();
   console.log("YourContract deployed to:", market.address);
