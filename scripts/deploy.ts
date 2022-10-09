@@ -27,10 +27,7 @@ async function main() {
 
 
   const MarketContract = await ethers.getContractFactory('Market');
-  const market = await MarketContract.deploy(
-    moonbaseOutboxAddress,
-    moonbeamDomain
-  );
+  const market = await MarketContract.deploy(goerliOutboxAddress, goerliDomain);
   await market.deployed();
   console.log("YourContract deployed to:", market.address);
 

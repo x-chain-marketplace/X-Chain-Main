@@ -34,6 +34,7 @@ contract Market is IMessageRecipient, Ownable {
   mapping(bytes32=>address) public sellerAddress;
   mapping(bytes32 => uint256) public listedPrice;
   mapping(bytes32 => uint32) public listedCurrency;
+  mapping(bytes32 => uint256) public paidPrice;
   mapping(uint32 => bytes32) public domainToContractAddress;
   mapping(uint32 => address) public currencyIdToChainlinkContract;
   mapping(uint32 => address) public currencyIdToCurrencyContractAddress;
@@ -75,13 +76,15 @@ contract Market is IMessageRecipient, Ownable {
     bytes32 key = keccak256(abi.encodePacked(domainId, nftContractAddress, tokenId, seller));
     require(listedPrice[key] != 0 || listedCurrency[key] != 0);
     if(currencyId == listedCurrency[key]){
+
     // Check transferred amount is match to the listedPrice
       require(listedPrice[key] <= msg.value);
-      seller.transfer(listedPrice[key]);
+      bytes32 paidPriceKey = keccak256(abi.encode(domainId, nftContractAddress, tokenId, msg.sender));
+      paidPrice[paidPriceKey] = msg.value;
 
     // Send message to the other chain 
-      _sendMessage(domainId, contractAddress, abi.encode("Trading", nftContractAddress, tokenId, msg.sender, listedPrice[key], 0,0));
-      _clearListing(key);
+      _sendMessage(domainId, contractAddress, abi.encode("Trading", nftContractAddress, tokenId, msg.sender, msg.value, currencyId, selfDomainId, address(this)));
+      _clearListing(domainId, nftContractAddress, tokenId, seller);
 
     }else{
     // Multipy currency * price both listed and used payment
@@ -90,37 +93,10 @@ contract Market is IMessageRecipient, Ownable {
       ( , int256 CurrencyPrice, , , ) = AggregatorV3Interface(chainlinkContractAddress).latestRoundData();
       ( , int256 listedCurrencyPrice, , , ) = AggregatorV3Interface(listedChainlinkContractAddress).latestRoundData();
       require(uint256(listedCurrencyPrice) * listedPrice[key] <= uint256(CurrencyPrice) * msg.value, "Market.sol: listedPrice and SendingPrice are not matched");
-      seller.transfer(msg.value);
-      // Send message to the other chain 
-      _sendMessage(domainId, contractAddress, abi.encode("Trading", nftContractAddress, tokenId, msg.sender, listedPrice[key], 0,0));
-      _clearListing(key);
-    }
-    emit Bought(nftContractAddress, tokenId, seller, listedPrice[key]);
-  }
 
-  function buyWithERC20(uint32 domainId, address contractAddress, address nftContractAddress, uint256 tokenId, address payable seller, uint32 currencyId, uint256 sendPrice)public {
-    require(currencyIdToChainlinkContract[currencyId] != address(0), "This currency isn't supported");
-    bytes32 key = keccak256(abi.encodePacked(domainId, nftContractAddress, tokenId, seller));
-    require(listedPrice[key] != 0 || listedCurrency[key] != 0);
-    if(currencyId == listedCurrency[key]){
-    // Check transferred amount is match to the listedPrice
-      require(listedPrice[key] <= sendPrice);
-      IERC20(currencyIdToCurrencyContractAddress[currencyId]).transferFrom(msg.sender, seller, listedPrice[key]);
-
-    // Send message to the other chain 
-      _sendMessage(domainId, contractAddress, abi.encode("Trading", nftContractAddress, tokenId, msg.sender, listedPrice[key], 0,0));
-      _clearListing(key);
-    }else{
-    // Multipy currency * price both listed and used payment
-      address chainlinkContractAddress = currencyIdToChainlinkContract[currencyId];
-      address listedChainlinkContractAddress = currencyIdToChainlinkContract[listedCurrency[key]];
-      ( , int256 CurrencyPrice, , , ) = AggregatorV3Interface(chainlinkContractAddress).latestRoundData();
-      ( , int256 listedCurrencyPrice, , , ) = AggregatorV3Interface(listedChainlinkContractAddress).latestRoundData();
-      require(uint256(listedCurrencyPrice) * listedPrice[key] <= uint256(CurrencyPrice) * sendPrice, "Market.sol: listedPrice and SendingPrice are not matched");
-      IERC20(currencyIdToCurrencyContractAddress[currencyId]).transferFrom(msg.sender, seller, listedPrice[key]);
       // Send message to the other chain 
-      _sendMessage(domainId, contractAddress, abi.encode("Trading", nftContractAddress, tokenId, msg.sender, listedPrice[key], 0,0));
-      _clearListing(key);
+      _sendMessage(domainId, contractAddress, abi.encode("Trading", nftContractAddress, tokenId, msg.sender, msg.value, currencyId, selfDomainId, address(this)));
+      _clearListing(domainId, nftContractAddress, tokenId, seller);
     }
     emit Bought(nftContractAddress, tokenId, seller, listedPrice[key]);
   }
@@ -131,7 +107,7 @@ contract Market is IMessageRecipient, Ownable {
     sellerAddress[keccak256(abi.encodePacked(selfDomainId, nftContractAddress, tokenId))] = msg.sender;
 
     // Send Message via Hyperlane
-    _sendMessage(domainIdTo, ourContractAddress, abi.encode("Listing", nftContractAddress, tokenId, msg.sender, price, currencyId));
+    _sendMessage(domainIdTo, ourContractAddress, abi.encode("Listing", nftContractAddress, tokenId, msg.sender, price, currencyId, selfDomainId, address(this)));
     bytes32 key = keccak256(abi.encodePacked(selfDomainId, nftContractAddress, tokenId, msg.sender));
     listedPrice[key] = price;
     listedCurrency[key] = currencyId;
@@ -140,7 +116,7 @@ contract Market is IMessageRecipient, Ownable {
   }
 
   function cancelListing(address nftContractAddress, uint256 tokenId) public {
-    bytes32 key = keccak256(abi.encodePacked(nftContractAddress, tokenId));
+    bytes32 key = keccak256(abi.encodePacked(selfDomainId, nftContractAddress, tokenId));
     require(msg.sender == sellerAddress[key]);
     IERC721(nftContractAddress).transferFrom(address(this), msg.sender, tokenId);
     sellerAddress[key] == address(0);
@@ -148,23 +124,44 @@ contract Market is IMessageRecipient, Ownable {
 
   function handle(uint32 _origin, bytes32 _sender, bytes calldata _messageBody) external override onlyResisterdContract(_origin, _sender) {
     // Branch, according to the message
-    (string memory messageType, address nftContractAddress, uint256 tokenId, address messageSender, uint256 price, uint32 currencyId) = abi.decode(_messageBody, (string, address, uint256, address, uint256, uint32));
-    bytes32 key = keccak256(abi.encodePacked(_origin, nftContractAddress, tokenId, messageSender));
-    bytes32 sellerAddressKey = keccak256(abi.encodePacked(_origin, nftContractAddress, tokenId));
+    (
+      string memory messageType, 
+      address nftContractAddress, 
+      uint256 tokenId, 
+      address messageSender, 
+      uint256 price, 
+      uint32 currencyId, 
+      uint32 originDomain, 
+      address originMarketAddress
+    ) = abi.decode(_messageBody, (string, address, uint256, address, uint256, uint32, uint32, address));
+    bytes32 keyListing = keccak256(abi.encodePacked(originDomain, nftContractAddress, tokenId, messageSender));
+    address seller = sellerAddress[keccak256(abi.encodePacked(selfDomainId, nftContractAddress, tokenId))];
+    bytes32 keyBuying = keccak256(abi.encodePacked(selfDomainId, nftContractAddress, tokenId, seller));
+    bytes32 sellerAddressKey = keccak256(abi.encodePacked(originDomain, nftContractAddress, tokenId));
     // case Listing
     // Upgrade the mapping price
     if (_compareStrings(messageType, "Listing")) {
       sellerAddress[sellerAddressKey] = messageSender;
-      listedPrice[key] = price;
-      listedCurrency[key] = currencyId;
-    }
-
-    // case Selling
-    // Transfer NFTs to the buyer 
-    if (_compareStrings(messageType, "Trading")) {
-        IERC721(nftContractAddress).transferFrom(address(this),messageSender,tokenId);
-        sellerAddress[keccak256(abi.encodePacked(selfDomainId, nftContractAddress, tokenId))] = address(0);
-        _clearListing(key);
+      listedPrice[keyListing] = price;
+      listedCurrency[keyListing] = currencyId;
+    }else if(_compareStrings(messageType, "Trading")){
+      if(listedPrice[keyBuying] == 0 || listedCurrency[keyBuying] == 0){
+        _sendMessage(originDomain, originMarketAddress, abi.encode("Reverted", nftContractAddress, tokenId, messageSender, price, currencyId, originDomain, originMarketAddress));
+        return;
+      }
+      IERC721(nftContractAddress).transferFrom(address(this),messageSender,tokenId);
+      _sendMessage(originDomain, originMarketAddress, abi.encode("Confirmd", nftContractAddress, tokenId, messageSender, price, currencyId, originDomain, originMarketAddress));
+      _clearListing(originDomain, nftContractAddress, tokenId, seller);
+    }else if(_compareStrings(messageType, "Confirm")) {
+      // Transfer currency or ERC20 from address(this) to the sellet
+      payable(sellerAddress[keccak256(abi.encodePacked(selfDomainId, nftContractAddress, tokenId))])
+      .transfer(paidPrice[keccak256(abi.encodePacked(selfDomainId, nftContractAddress, tokenId, messageSender))]);
+      // Clear the listing
+      _clearListing(selfDomainId, nftContractAddress, tokenId, messageSender);
+    }else if(_compareStrings(messageType, "Reverted")) {
+      // Transfer currency or ERC20 from address(this) to the buyer
+      payable(messageSender).transfer(paidPrice[keccak256(abi.encodePacked(selfDomainId, nftContractAddress, tokenId, messageSender))]);
+      // Clear the listing
     }
   }
 
@@ -185,9 +182,12 @@ contract Market is IMessageRecipient, Ownable {
     IOutbox(outbox).dispatch(_destinationDomain, _addressToBytes32(_receipient), _callData);
   }
 
-  function _clearListing(bytes32 key)internal {
+  function _clearListing(uint32 domainId, address nftContractAddress, uint256 tokenId, address seller)internal {
+    sellerAddress[keccak256(abi.encodePacked(selfDomainId, nftContractAddress, tokenId))] = address(0);
+    bytes32 key = keccak256(abi.encodePacked(domainId, nftContractAddress, tokenId, seller));
     listedCurrency[key] = 0;
     listedPrice[key] = 0;
+
   }
 
   // Not important internal functions
@@ -215,6 +215,33 @@ contract Market is IMessageRecipient, Ownable {
     result[0] = uint256(listedCurrencyPrice) * listedPrice[key];
     result[1] = uint256(CurrencyPrice) * msgValue;
     return result;
+  }
+
+  function buyWithERC20(uint32 domainId, address contractAddress, address nftContractAddress, uint256 tokenId, address payable seller, uint32 currencyId, uint256 sendPrice)public {
+    require(currencyIdToChainlinkContract[currencyId] != address(0), "This currency isn't supported");
+    bytes32 key = keccak256(abi.encodePacked(domainId, nftContractAddress, tokenId, seller));
+    require(listedPrice[key] != 0 || listedCurrency[key] != 0);
+    if(currencyId == listedCurrency[key]){
+    // Check transferred amount is match to the listedPrice
+      require(listedPrice[key] <= sendPrice);
+      IERC20(currencyIdToCurrencyContractAddress[currencyId]).transferFrom(msg.sender, address(this), listedPrice[key]);
+
+    // Send message to the other chain 
+      _sendMessage(domainId, contractAddress, abi.encode("Trading", nftContractAddress, tokenId, msg.sender, 0, 0, selfDomainId, address(this)));
+      _clearListing(domainId, nftContractAddress, tokenId, seller);
+    }else{
+    // Multipy currency * price both listed and used payment
+      address chainlinkContractAddress = currencyIdToChainlinkContract[currencyId];
+      address listedChainlinkContractAddress = currencyIdToChainlinkContract[listedCurrency[key]];
+      ( , int256 CurrencyPrice, , , ) = AggregatorV3Interface(chainlinkContractAddress).latestRoundData();
+      ( , int256 listedCurrencyPrice, , , ) = AggregatorV3Interface(listedChainlinkContractAddress).latestRoundData();
+      require(uint256(listedCurrencyPrice) * listedPrice[key] <= uint256(CurrencyPrice) * sendPrice, "Market.sol: listedPrice and SendingPrice are not matched");
+      IERC20(currencyIdToCurrencyContractAddress[currencyId]).transferFrom(msg.sender, address(this), listedPrice[key]);
+      // Send message to the other chain 
+      _sendMessage(domainId, contractAddress, abi.encode("Trading", nftContractAddress, tokenId, msg.sender, 0, 0,selfDomainId, address(this)));
+      _clearListing(domainId, nftContractAddress, tokenId, seller);
+    }
+    emit Bought(nftContractAddress, tokenId, seller, listedPrice[key]);
   }
 
 }
