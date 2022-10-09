@@ -39,9 +39,15 @@ import {
 } from 'wagmi'
 import marketABI from '../../../../artifacts/contracts/Market.sol/Market.json'
 import { Chain } from '../../../../types'
-import { formatEther, getAddress, parseEther } from 'ethers/lib/utils'
+import {
+  formatEther,
+  formatUnits,
+  getAddress,
+  parseEther,
+} from 'ethers/lib/utils'
 import { BigNumber, ethers } from 'ethers'
 import * as PushAPI from '@pushprotocol/restapi'
+import { TransactionReceipt } from '@ethersproject/providers'
 
 const mumbaiContractAddress = '0xC885a10d858179140Bc48283217297910A8eE0Dd'
 const goerliContractAddress = '0x3bbF06ad0468F4883e3142A7c7dB6CaD12229cd1'
@@ -54,6 +60,11 @@ const chainToContractAddress = new Map<Chain, string>([
 const chainToHyperlaneId = new Map<Chain, string>([
   [Chain.ethereum, '5'],
   [Chain.polygon, '80001'],
+])
+
+const chainIdToCurrencyId = new Map<string, string>([
+  ['80001', '2'],
+  ['5', '1'],
 ])
 
 enum TransactionState {
@@ -79,6 +90,7 @@ const NftIndex: NextPage = () => {
   const [transactionState, setTransactionState] = useState<TransactionState>(
     TransactionState.notStarted
   )
+  const [txnReceipt, setTxnReceipt] = useState<null | TransactionReceipt>(null)
   const { colorMode, toggleColorMode } = useColorMode()
 
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -119,6 +131,8 @@ const NftIndex: NextPage = () => {
     tokenId,
   ]
 
+  // GET LISTING INFORMATION
+
   const {
     data: listingInfoData,
     isError: isErrorListingInfo,
@@ -128,62 +142,174 @@ const NftIndex: NextPage = () => {
     contractInterface: marketABI.abi,
     functionName: 'getListInformation',
     args: getListInformationArgs,
-    chainId: userConnectedChain?.id ?? 80001,
+    chainId: userConnectedChain?.id,
   })
   const listingInfo = listingInfoData as ListingInfo | undefined
   const sellerConnected = listingInfo && listingInfo[0] === address
+  const ownerConnected =
+    nftOwner != null &&
+    address != null &&
+    getAddress(nftOwner) === getAddress(address)
+
+  // BUY
 
   console.log('listing info')
   console.log(listingInfo)
 
+  const nftSourceDomainId = chainToHyperlaneId.get(listingChain as Chain)
+  const nftSourceContractAddress = chainToContractAddress.get(
+    listingChain as Chain
+  )
+  const sellerAddress = listingInfo && listingInfo[0]
+  const buyerCurrencyId =
+    userConnectedChain &&
+    chainIdToCurrencyId.get(userConnectedChain.id.toString() as string)
   const buyArgs = [
-    chainToHyperlaneId.get(listingChain as Chain),
-    chainToContractAddress.get(listingChain as Chain),
+    nftSourceDomainId,
+    nftSourceContractAddress,
     contract,
     tokenId,
-    listingInfo && listingInfo[0],
-    '2',
+    sellerAddress,
+    buyerCurrencyId,
   ]
-
-  const { config } = usePrepareContractWrite({
+  const { config: buyConfig } = usePrepareContractWrite({
     addressOrName: chainToContractAddress.get(Chain.polygon) as string,
     contractInterface: marketABI.abi,
     functionName: 'buy',
     args: buyArgs,
     chainId: userConnectedChain?.id ?? 80001,
     enabled: listingInfo != null,
-    overrides: { value: parseEther('1') },
+    overrides: { value: parseEther('0.5') },
   })
-
   console.log('buy config')
-  console.log(config)
-
+  console.log(buyConfig)
   const {
-    data: result,
-    isLoading,
-    isSuccess,
-    writeAsync,
-  } = useContractWrite(config)
+    data: buyResult,
+    writeAsync: buy,
+    error: buyError,
+  } = useContractWrite(buyConfig)
+  console.log('Buy Error')
+  console.log(buyError)
+  console.log('Buy Result')
+  console.log(buyResult)
+  console.log('Buy function')
+  console.log(buy)
 
-  console.log('Write function')
-  console.log(writeAsync)
+  // SELL
+
+  console.log(`Owner connected: ${ownerConnected}`)
+  console.log(`Seller connected: ${sellerConnected}`)
+
+  const currencyId = listingChain === Chain.ethereum ? '1' : '2'
+  const chainId = listingChain === Chain.ethereum ? '80001' : '5'
+  const contractToMessage = chainToContractAddress.get(Chain.polygon)
+  const sellArgs = [
+    contract,
+    tokenId,
+    formatUnits(parseEther('0.0001'), 'wei'),
+    currencyId,
+    chainId,
+    contractToMessage,
+  ]
+  const { config: sellConfig } = usePrepareContractWrite({
+    addressOrName: chainToContractAddress.get(listingChain as Chain) as string,
+    contractInterface: marketABI.abi,
+    functionName: 'list',
+    args: sellArgs,
+    chainId: 5,
+    enabled: ownerConnected,
+  })
+  console.log('sell config')
+  console.log(sellConfig)
+  const {
+    data: sellResult,
+    writeAsync: sell,
+    error: sellError,
+  } = useContractWrite(sellConfig)
+  console.log('Sell Error')
+  console.log(sellError)
+  console.log('Sell Result')
+  console.log(sellResult)
+  console.log('Sell function')
+  console.log(sell)
+
+  // Higher level functions
+
+  // TODO DRY sell and buy XD
 
   const buyNFT = async () => {
-    if (!writeAsync) {
-      throw new Error('Write not ready, button should be disabled')
+    if (!buy) {
+      throw new Error('buy not ready, button should be disabled')
     }
 
     setTransactionState(TransactionState.pending)
-    const txnRes = await writeAsync()
+    const txnRes = await buy()
     console.log(`Txn hash: ${txnRes.hash}`)
     console.log('waiting')
 
     const txn = await txnRes.wait()
     console.log('Done')
     console.log(txn)
+    setTxnReceipt(txn)
     setTransactionState(TransactionState.complete)
   }
+
+  const sellNFT = async () => {
+    if (!sell) {
+      throw new Error('Sell not ready, button should be disabled')
+    }
+
+    setTransactionState(TransactionState.pending)
+    const txnRes = await sell()
+    console.log(`Txn hash: ${txnRes.hash}`)
+    console.log('waiting')
+
+    const txn = await txnRes.wait()
+    console.log('Done')
+    console.log(txn)
+    setTxnReceipt(txn)
+    setTransactionState(TransactionState.complete)
+  }
+
+  const push = async () => {
+    if (!address) return
+    const PK =
+      '75b2c1b5eb14c0a2178e06d065f804d5cb62834b4afa34328ff274ab38d755a7' // channel private key
+    const Pkey = `0x${PK}`
+    const signer = new ethers.Wallet(Pkey)
+    try {
+      const apiResponse = await PushAPI.payloads.sendNotification({
+        signer,
+        type: 3, // target
+        identityType: 2, // direct payload
+        notification: {
+          title: `Your NFT was sold`,
+          body: `{NFT_NAME was sold for {} ETH on {} network`,
+        },
+        payload: {
+          title: `Your NFT was sold`,
+          body: `{NFT_NAME was sold for {} ETH on {} network`,
+          cta: '',
+          img: '',
+        },
+        recipients: `eip155:5:${address}`, // recipient address
+        channel: 'eip155:5:0xB9dBFEF2751682519EFAC269baD93fD62C4ac455', // your channel address
+        env: 'staging',
+      })
+
+      // apiResponse?.status === 204, if sent successfully!
+      console.log('API repsonse: ', apiResponse)
+    } catch (err) {
+      console.error('Error: ', err)
+    }
+  }
+
+  // UI Segments
+
+  const currentContractWrite = ownerConnected ? sellNFT : buyNFT
   const modalInterior = (transactionState: TransactionState) => {
+    const explorerUrl = `${userConnectedChain?.blockExplorers?.default.url}/tx/${txnReceipt?.transactionHash}`
+
     switch (transactionState) {
       case TransactionState.notStarted:
         return (
@@ -196,7 +322,7 @@ const NftIndex: NextPage = () => {
               color="#fff"
               borderRadius="120px"
               fontSize="20px"
-              onClick={buyNFT}
+              onClick={currentContractWrite}
               _hover={{
                 background: '#ff660099',
                 transition: '0.5s',
@@ -204,7 +330,7 @@ const NftIndex: NextPage = () => {
                 color: '#fff',
               }}
             >
-              Buy NFT
+              {ownerConnected ? 'Sell NFT' : 'Buy NFT'}
             </Button>
 
             <Button
@@ -226,10 +352,7 @@ const NftIndex: NextPage = () => {
             marginTop={10}
           >
             <Spinner marginBottom={5} />
-            <Link
-              fontSize="md"
-              href="https://etherscan.io/tx/0x077b71c0517104c8a47fd6eb3415c436a472bfe77322dcd6c0de561b358317f9"
-            >
+            <Link fontSize="md" href={explorerUrl}>
               View the transaction
             </Link>
           </Flex>
@@ -245,10 +368,7 @@ const NftIndex: NextPage = () => {
             <Text color="ffffff" marginBottom={5}>
               Yay everything worked
             </Text>
-            <Link
-              fontSize="md"
-              href="https://etherscan.io/tx/0x077b71c0517104c8a47fd6eb3415c436a472bfe77322dcd6c0de561b358317f9"
-            >
+            <Link fontSize="md" href={explorerUrl}>
               View the transaction
             </Link>
           </Flex>
@@ -311,10 +431,27 @@ const NftIndex: NextPage = () => {
       return <Spinner />
     }
 
+    if (!listedWithUs) {
+      return (
+        <>
+          <Text color="#ffffff" fontSize="lg">
+            not listed with us!
+          </Text>
+          {ownerConnected ? (
+            <Button onClick={onOpen} disabled={false}>
+              {!userConnectedChain
+                ? 'connect your wallet to list your NFT'
+                : `Sell on ${listingChain}`}
+            </Button>
+          ) : null}
+        </>
+      )
+    }
+
     if (listingInfo == null || isErrorListingInfo) {
       return (
         <Text color="#ffffff" fontSize="lg">
-          Something went wrong while fetching listing Info
+          There was a problem loading in listing data
         </Text>
       )
     }
@@ -405,7 +542,7 @@ const NftIndex: NextPage = () => {
             >
               <Button
                 onClick={onOpen}
-                disabled={writeAsync == null || userConnectedChain == null}
+                disabled={false}
                 background="#FF6600"
                 border="2px solid #FF6600"
                 padding="25px 20px"
@@ -419,9 +556,11 @@ const NftIndex: NextPage = () => {
                   color: '#fff',
                 }}
               >
-                {userConnectedChain
-                  ? `Buy on ${userConnectedChain.name}`
-                  : 'connect your wallet to buy this'}
+                {!userConnectedChain
+                  ? 'connect your wallet to buy this'
+                  : ownerConnected
+                  ? `Sell on ${listingChain}`
+                  : `Buy on ${userConnectedChain.name}`}
               </Button>
             </Box>
           </>
@@ -430,38 +569,7 @@ const NftIndex: NextPage = () => {
     )
   }
 
-  const push = async () => {
-    if (!address) return
-    const PK =
-      '75b2c1b5eb14c0a2178e06d065f804d5cb62834b4afa34328ff274ab38d755a7' // channel private key
-    const Pkey = `0x${PK}`
-    const signer = new ethers.Wallet(Pkey)
-    try {
-      const apiResponse = await PushAPI.payloads.sendNotification({
-        signer,
-        type: 3, // target
-        identityType: 2, // direct payload
-        notification: {
-          title: `Your NFT was sold`,
-          body: `{NFT_NAME was sold for {} ETH on {} network`,
-        },
-        payload: {
-          title: `Your NFT was sold`,
-          body: `{NFT_NAME was sold for {} ETH on {} network`,
-          cta: '',
-          img: '',
-        },
-        recipients: `eip155:5:${address}`, // recipient address
-        channel: 'eip155:5:0xB9dBFEF2751682519EFAC269baD93fD62C4ac455', // your channel address
-        env: 'staging',
-      })
-
-      // apiResponse?.status === 204, if sent successfully!
-      console.log('API repsonse: ', apiResponse)
-    } catch (err) {
-      console.error('Error: ', err)
-    }
-  }
+  // Component
 
   return (
     <Layout>
