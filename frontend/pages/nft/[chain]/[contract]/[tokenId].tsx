@@ -157,7 +157,7 @@ const NftIndex: NextPage = () => {
               background="#FF6600"
               mr={3}
               border="2px solid #FF6600"
-              padding="25px 40px"
+              padding="25px 70px"
               color="#fff"
               borderRadius="120px"
               fontSize="20px"
@@ -174,9 +174,11 @@ const NftIndex: NextPage = () => {
 
             <Button
               border="2px solid #ccc"
+              fontSize="20px"
               borderRadius="120px"
               padding="25px 30px"
               onClick={onClose}
+              color="#000"
             >
               Back
             </Button>
@@ -190,9 +192,9 @@ const NftIndex: NextPage = () => {
             marginBottom={10}
             marginTop={10}
           >
-            <Spinner marginBottom={5} />
-            <Link fontSize="md" href={explorerUrl}>
-              View the transaction
+            <Spinner color="#000" width="80px" height="80px" marginBottom={5} />
+            <Link fontSize="md" color="#c0c0c0" href={explorerUrl}>
+              View the Transaction
             </Link>
           </Flex>
         )
@@ -202,13 +204,30 @@ const NftIndex: NextPage = () => {
             alignItems="center"
             flexDir="column"
             marginBottom={10}
-            marginTop={10}
+            marginTop={5}
           >
-            <Text color="ffffff" marginBottom={5}>
-              Yay everything worked
+            <Text fontSize="32px" color="#000" marginBottom={5}>
+              Yay Everything Worked!
             </Text>
-            <Link fontSize="md" href={explorerUrl}>
-              View the transaction
+            <Link fontSize="md" textUnderline="none" href={explorerUrl}>
+              <Button
+                background="#FF6600"
+                mr={3}
+                border="2px solid #FF6600"
+                padding="25px 40px"
+                color="#fff"
+                borderRadius="120px"
+                fontSize="20px"
+                onClick={currentContractWrite}
+                _hover={{
+                  background: '#ff660099',
+                  transition: '0.5s',
+                  transform: 'scale(1.05)',
+                  color: '#fff',
+                }}
+              >
+                View the transaction
+              </Button>
             </Link>
           </Flex>
         )
@@ -293,12 +312,21 @@ const NftIndex: NextPage = () => {
     if (!listedWithUs) {
       return (
         <>
-           <Image
-              display="block" mx="auto" mt="20" mb="5"
-              src="/caution.svg"
-              fallbackSrc="/caution.svg"
-            />
-          <Text color="#ffffff" as="b" display="flex" justifyContent="center" fontSize="lg">
+          <Image
+            display="block"
+            mx="auto"
+            mt="20"
+            mb="5"
+            src="/caution.svg"
+            fallbackSrc="/caution.svg"
+          />
+          <Text
+            color="#ffffff"
+            as="b"
+            display="flex"
+            justifyContent="center"
+            fontSize="lg"
+          >
             This Asset is Not Listed with Us!
           </Text>
           {ownerConnected ? (
@@ -600,13 +628,20 @@ const NftIndex: NextPage = () => {
 
       <Modal closeOnOverlayClick={false} isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
-        <ModalContent h="700px" maxW="850px">
+        <ModalContent
+          h="750px"
+          maxW="850px"
+          borderRadius="xl"
+          background="#fff"
+        >
           <ModalHeader mx="auto">
-            <Text fontSize="34px">Transaction Summary</Text>
+            <Text color="#000" fontSize="34px">
+              Transaction Summary
+            </Text>
           </ModalHeader>
-          <ModalCloseButton />
+          <ModalCloseButton color="#000" />
           <ModalBody pb={6}>
-            <Flex justifyContent="space-between">
+            <Flex color="#000" justifyContent="space-between">
               {ownerConnected
                 ? nftActionPreview(
                     'You are Listing',
@@ -617,7 +652,7 @@ const NftIndex: NextPage = () => {
                     )?.name as string
                   )
                 : currencyActionPreview(
-                    'You are paying',
+                    'You Are Paying:',
                     userConnectedChain?.name as string,
                     userConnectedChain?.nativeCurrency?.name as string,
                     (listingInfo && formatEther(listingInfo[1])) as string
@@ -630,7 +665,7 @@ const NftIndex: NextPage = () => {
                     (listingInfo && formatEther(listingInfo[1])) as string
                   )
                 : nftActionPreview(
-                    'You are recieving',
+                    'You Are Recieving:',
                     image as string,
                     nft?.title as string,
                     supportedChainToWagmiChain.get(
