@@ -161,7 +161,7 @@ const NftIndex: NextPage = () => {
     args: buyArgs,
     chainId: userConnectedChain?.id ?? 80001,
     enabled: listingInfo != null,
-    overrides: { value: parseEther('1') },
+    overrides: { value: parseEther('0.5') },
   })
   console.log('buy config')
   console.log(buyConfig)
@@ -386,16 +386,6 @@ const NftIndex: NextPage = () => {
     if (isLoading) {
       return <Spinner />
     }
-
-    const actionButton = (
-      <Button onClick={onOpen} disabled={false}>
-        {!userConnectedChain
-          ? 'connect your wallet to buy this'
-          : ownerConnected
-          ? `Sell on ${listingChain}`
-          : `Buy on ${userConnectedChain.name}`}
-      </Button>
-    )
 
     if (listingInfo == null) {
       return (
