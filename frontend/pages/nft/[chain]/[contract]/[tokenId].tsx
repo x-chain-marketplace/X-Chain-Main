@@ -118,6 +118,11 @@ const NftIndex: NextPage = () => {
     address != null &&
     getAddress(nftOwner) === getAddress(address)
 
+  console.log('Owner connected')
+  console.log(nftOwner)
+  console.log(address)
+  console.log(ownerConnected)
+
   const { txnReceipt, txnState, txnHash, buyNFT, sellNFT } = useMarketContract(
     listingInfo,
     listingChain as SupportedChains,
@@ -131,19 +136,19 @@ const NftIndex: NextPage = () => {
   // UI Segments
   const currentContractWrite = ownerConnected
     ? async () => {
-        await sellNFT
+        await sellNFT()
         const params = new URLSearchParams({
           message: 'Asset listed for sale!',
         })
-        router.push(`/done?${params.toString()}`)
+        //router.push(`/done?${params.toString()}`)
       }
     : async () => {
-        await buyNFT
+        await buyNFT()
         const params = new URLSearchParams({
           message: 'Purchase Successful',
           assetLink: 'mock this',
         })
-        router.push(`/done?${params.toString()}`)
+        //router.push(`/done?${params.toString()}`)
       }
 
   const modalInterior = (txnState: TransactionState) => {
@@ -293,12 +298,21 @@ const NftIndex: NextPage = () => {
     if (!listedWithUs) {
       return (
         <>
-           <Image
-              display="block" mx="auto" mt="20" mb="5"
-              src="/caution.svg"
-              fallbackSrc="/caution.svg"
-            />
-          <Text color="#ffffff" as="b" display="flex" justifyContent="center" fontSize="lg">
+          <Image
+            display="block"
+            mx="auto"
+            mt="20"
+            mb="5"
+            src="/caution.svg"
+            fallbackSrc="/caution.svg"
+          />
+          <Text
+            color="#ffffff"
+            as="b"
+            display="flex"
+            justifyContent="center"
+            fontSize="lg"
+          >
             This Asset is Not Listed with Us!
           </Text>
           {ownerConnected ? (
