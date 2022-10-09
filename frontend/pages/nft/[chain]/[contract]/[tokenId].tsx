@@ -43,6 +43,7 @@ import {
 } from 'ethers/lib/utils'
 import { BigNumber, ethers } from 'ethers'
 import * as PushAPI from '@pushprotocol/restapi'
+import { TransactionReceipt } from '@ethersproject/providers'
 
 const mumbaiContractAddress = '0xC885a10d858179140Bc48283217297910A8eE0Dd'
 const goerliContractAddress = '0x3bbF06ad0468F4883e3142A7c7dB6CaD12229cd1'
@@ -79,6 +80,7 @@ const NftIndex: NextPage = () => {
   const [transactionState, setTransactionState] = useState<TransactionState>(
     TransactionState.notStarted
   )
+  const [txnReceipt, setTxnReceipt] = useState<null | TransactionReceipt>(null)
   const { colorMode, toggleColorMode } = useColorMode()
 
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -227,6 +229,7 @@ const NftIndex: NextPage = () => {
     const txn = await txnRes.wait()
     console.log('Done')
     console.log(txn)
+    setTxnReceipt(txn)
     setTransactionState(TransactionState.complete)
   }
 
@@ -243,6 +246,7 @@ const NftIndex: NextPage = () => {
     const txn = await txnRes.wait()
     console.log('Done')
     console.log(txn)
+    setTxnReceipt(txn)
     setTransactionState(TransactionState.complete)
   }
 
@@ -283,6 +287,8 @@ const NftIndex: NextPage = () => {
 
   const currentContractWrite = ownerConnected ? sellNFT : buyNFT
   const modalInterior = (transactionState: TransactionState) => {
+    const explorerUrl = `${userConnectedChain?.blockExplorers?.default.url}/tx/${txnReceipt?.transactionHash}`
+
     switch (transactionState) {
       case TransactionState.notStarted:
         return (
@@ -302,10 +308,7 @@ const NftIndex: NextPage = () => {
             marginTop={10}
           >
             <Spinner marginBottom={5} />
-            <Link
-              fontSize="md"
-              href="https://etherscan.io/tx/0x077b71c0517104c8a47fd6eb3415c436a472bfe77322dcd6c0de561b358317f9"
-            >
+            <Link fontSize="md" href={explorerUrl}>
               View the transaction
             </Link>
           </Flex>
@@ -321,10 +324,7 @@ const NftIndex: NextPage = () => {
             <Text color="ffffff" marginBottom={5}>
               Yay everything worked
             </Text>
-            <Link
-              fontSize="md"
-              href="https://etherscan.io/tx/0x077b71c0517104c8a47fd6eb3415c436a472bfe77322dcd6c0de561b358317f9"
-            >
+            <Link fontSize="md" href={explorerUrl}>
               View the transaction
             </Link>
           </Flex>
