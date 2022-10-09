@@ -3,4 +3,5 @@
 /* eslint-disable */
 export { IMessageRecipient__factory } from "./IMessageRecipient__factory";
 export { IOutbox__factory } from "./IOutbox__factory";
+export { IPUSHCommInterface__factory } from "./IPUSHCommInterface__factory";
 export { Market__factory } from "./Market__factory";
