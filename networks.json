@@ -44,7 +44,7 @@
     "rpc": "https://rpc.api.moonbase.moonbeam.network",
     "explore": "https://moonbase.moonscan.io/",
     "outbox": "0x54148470292C24345fb828B003461a9444414517",
-    "deployedContract": "0xB8889f1d11668467A45e5C9D0848C880caAA4E6f",
+    "deployedContract": "0xC36D720156656b0A5345600A31EFf33811b7dE9A",
     "domain": "0x6d6f2d61"
   },
   "polygonMumbai": {
