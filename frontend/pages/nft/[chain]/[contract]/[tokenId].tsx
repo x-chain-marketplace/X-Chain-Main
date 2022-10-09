@@ -19,6 +19,10 @@ import {
   Spinner,
   useDisclosure,
   Link,
+  Stat,
+  StatLabel,
+  StatNumber,
+  StatHelpText,
 } from '@chakra-ui/react'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
@@ -65,6 +69,7 @@ enum TransactionState {
   notStarted = 'notStarted',
 }
 
+// sellerAddress, price, currencyId
 type ListingInfo = [string, BigNumber, string]
 
 const NftIndex: NextPage = () => {
@@ -292,11 +297,34 @@ const NftIndex: NextPage = () => {
     switch (transactionState) {
       case TransactionState.notStarted:
         return (
-          <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={currentContractWrite}>
+          <ModalFooter display="flex" justifyContent="center">
+            <Button
+              background="#FF6600"
+              mr={3}
+              border="2px solid #FF6600"
+              padding="25px 40px"
+              color="#fff"
+              borderRadius="120px"
+              fontSize="20px"
+              onClick={currentContractWrite}
+              _hover={{
+                background: '#ff660099',
+                transition: '0.5s',
+                transform: 'scale(1.05)',
+                color: '#fff',
+              }}
+            >
               {ownerConnected ? 'Sell NFT' : 'Buy NFT'}
             </Button>
-            <Button onClick={onClose}>Back</Button>
+
+            <Button
+              border="2px solid #ccc"
+              borderRadius="120px"
+              padding="25px 30px"
+              onClick={onClose}
+            >
+              Back
+            </Button>
           </ModalFooter>
         )
       case TransactionState.pending:
@@ -363,7 +391,7 @@ const NftIndex: NextPage = () => {
             <Text color="#ffffff" fontSize="xs">
               Contract Address:
             </Text>
-            <Text color="#ffffff" fontSize="xl">{`${contract}`}</Text>
+            <Text color="#ffffff" fontSize="xl" as="b">{`${contract}`}</Text>
           </Flex>
         </div>
 
@@ -372,7 +400,7 @@ const NftIndex: NextPage = () => {
             <Text color="#ffffff" mt="3" fontSize="xs">
               TokenId:
             </Text>
-            <Text color="#ffffff" fontSize="xl">{`${tokenId}`}</Text>
+            <Text color="#ffffff" fontSize="xl" as="b">{`${tokenId}`}</Text>
           </Flex>
         </div>
       </Box>
@@ -482,8 +510,28 @@ const NftIndex: NextPage = () => {
                 </Flex>
               </div>
             </Box>
-            <Box>
-              <Button onClick={onOpen} disabled={false}>
+            <Box
+              display="flex"
+              justifyContent="center"
+              padding="40px"
+              background="linear-gradient(180deg, #27183F 0%, #170D27 100%);"
+            >
+              <Button
+                onClick={onOpen}
+                disabled={false}
+                background="#FF6600"
+                border="2px solid #FF6600"
+                padding="25px 20px"
+                color="#fff"
+                borderRadius="120px"
+                fontSize="20px"
+                _hover={{
+                  background: '#ff660099',
+                  transition: '0.5s',
+                  transform: 'scale(1.05)',
+                  color: '#fff',
+                }}
+              >
                 {!userConnectedChain
                   ? 'connect your wallet to buy this'
                   : ownerConnected
@@ -509,7 +557,7 @@ const NftIndex: NextPage = () => {
       >
         <GridItem
           colSpan={1}
-          bg="#170D27"
+          bg="linear-gradient(180deg, #27183F 0%, #170D27 100%);"
           borderRadius="xl"
           borderColor="#ffffff"
           border="5px"
@@ -519,7 +567,7 @@ const NftIndex: NextPage = () => {
         </GridItem>
         <GridItem
           colSpan={1}
-          bg="#170D27"
+          bg="linear-gradient(180deg, #27183F 0%, #170D27 100%);"
           borderRadius="xl"
           borderColor="#ffffff"
           border="5px"
@@ -531,10 +579,126 @@ const NftIndex: NextPage = () => {
 
       <Modal closeOnOverlayClick={false} isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Transaction Summary</ModalHeader>
+        <ModalContent h="700px" maxW="850px">
+          <ModalHeader mx="auto">
+            <Text fontSize="34px">Transaction Summary</Text>
+          </ModalHeader>
           <ModalCloseButton />
-          <ModalBody pb={6}>Insightful Transaction Summary</ModalBody>
+          <ModalBody pb={6}>
+            <Flex justifyContent="space-between">
+              <Stat mr="5">
+                <StatLabel fontSize="lg" mb="2">
+                  You Are Paying
+                </StatLabel>
+                <Box
+                  p="5"
+                  border="1px"
+                  display="flex"
+                  borderRadius="xl"
+                  flexDirection="column"
+                  justifyContent="center"
+                  background="linear-gradient(180deg, #27183F 0%, #170D27 100%)"
+                  minHeight="400px"
+                  borderColor="#ccc"
+                >
+                  <div>
+                    <Flex>
+                      <Image
+                        mb={10}
+                        ml={5}
+                        pr={5}
+                        src="/price-icon.svg"
+                        fallbackSrc="/price-icon.svg"
+                      />
+                      <Flex flexDirection="column">
+                        <Text fontSize="xs" color="#fff">
+                          Price:
+                        </Text>
+                        <Text fontSize="xl" as="b" color="#fff">
+                          <StatNumber>{`${
+                            listingInfo && formatEther(listingInfo[1])
+                          } ${
+                            userConnectedChain?.nativeCurrency?.name
+                          }`}</StatNumber>
+                        </Text>
+                      </Flex>
+                    </Flex>
+                  </div>
+                  <div>
+                    <Flex>
+                      <Image
+                        mb={4}
+                        ml={5}
+                        pr={5}
+                        src="/chain-icon.svg"
+                        fallbackSrc="/chain-icon.svg"
+                      />
+                      <Flex flexDirection="column">
+                        <Text fontSize="xs" color="#fff">
+                          Chain:
+                        </Text>
+                        <Text fontSize="xl" as="b" color="#fff">
+                          {userConnectedChain?.name}
+                        </Text>
+                      </Flex>
+                    </Flex>
+                  </div>
+                </Box>
+              </Stat>
+              <Stat ml="5">
+                <StatLabel fontSize="lg" mb="2">
+                  You Are Recieving
+                </StatLabel>
+                <Box
+                  p="5"
+                  border="1px"
+                  borderColor="#ccc"
+                  minHeight="400px"
+                  background="linear-gradient(180deg, #27183F 0%, #170D27 100%)"
+                  borderRadius="xl"
+                >
+                  <Img
+                    display="block"
+                    mx="auto"
+                    boxSize="xs"
+                    width="200px"
+                    height="100%"
+                    src={image}
+                  />
+                  <StatNumber
+                    display="flex"
+                    color="#fff"
+                    justifyContent="center"
+                    mt="2"
+                    fontSize="xl"
+                    mb="5"
+                  >
+                    {nft?.title}
+                  </StatNumber>
+
+                  <div>
+                    <Flex>
+                      <Image
+                        mb={4}
+                        ml={5}
+                        pr={5}
+                        src="/chain-icon.svg"
+                        fallbackSrc="/chain-icon.svg"
+                      />
+                      <Flex flexDirection="column">
+                        <Text color="#fff" fontSize="xs">
+                          Chain:
+                        </Text>
+                        <Text color="#fff" fontSize="xl" as="b">
+                          {listingChain}
+                        </Text>
+                      </Flex>
+                    </Flex>
+                  </div>
+                </Box>
+              </Stat>
+            </Flex>
+          </ModalBody>
           {modalInterior(transactionState)};
         </ModalContent>
       </Modal>
