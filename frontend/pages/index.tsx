@@ -26,7 +26,7 @@ const Home: NextPage = () => {
   const handleTokenIdChange = (event: any) => setTokenId(event.target.value)
   return (
     <Layout>
-      <Box maxW='lg' mx='auto'>
+      <Box maxW="lg" mx="auto">
         <Stack spacing={4}>
           <RadioGroup
             onChange={(value) => setChain(value as Chain)}
@@ -67,9 +67,21 @@ const Home: NextPage = () => {
 
           <Button
             mt={4}
-            colorScheme="orange"
+            background="#FF6600"
+            mr={3}
+            border="2px solid #FF6600"
+            padding="25px 40px"
+            color="#fff"
+            borderRadius="120px"
+            fontSize="20px"
             onClick={() => {
               router.push(`/nft/${chain}/${contract}/${tokenId}`)
+            }}
+            _hover={{
+              background: '#ff660099',
+              transition: '0.5s',
+              transform: 'scale(1.05)',
+              color: '#fff',
             }}
           >
             Go
