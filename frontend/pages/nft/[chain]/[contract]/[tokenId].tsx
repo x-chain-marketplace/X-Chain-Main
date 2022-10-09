@@ -203,7 +203,17 @@ const NftIndex: NextPage = () => {
 
   const nftData = (nft: Nft | null, isLoading: boolean) => {
     if (isLoading) {
-      return <Spinner />
+      return (
+        <Spinner
+          marginTop="20px"
+          width="100px"
+          height="100px"
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          mx="auto"
+        />
+      )
     }
 
     if (nft == null || isErrorFetchingMetadata) {
@@ -251,7 +261,17 @@ const NftIndex: NextPage = () => {
     isLoading: boolean
   ) => {
     if (isLoading) {
-      return <Spinner />
+      return (
+        <Spinner
+          marginTop="20px"
+          width="100px"
+          height="100px"
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          mx="auto"
+        />
+      )
     }
 
     if (!listedWithUs) {
@@ -282,7 +302,15 @@ const NftIndex: NextPage = () => {
     return (
       <Box>
         {isLoadingMetadata ? (
-          <Spinner />
+          <Spinner
+            marginTop="20px"
+            width="100px"
+            height="100px"
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            mx="auto"
+          />
         ) : (
           <>
             <Heading color="#ffffff" marginBottom={5}>
