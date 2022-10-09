@@ -8,6 +8,8 @@ import {
   Radio,
   RadioGroup,
   Stack,
+  Img,
+  Text,
 } from '@chakra-ui/react'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
@@ -33,10 +35,52 @@ const Home: NextPage = () => {
             onChange={(value) => setChain(value as Chain)}
             value={chain}
           >
-            <Stack direction="row">
-              <Radio value={Chain.ethereum}>Ethereum</Radio>
-              <Radio value={Chain.optimism}>Optimism</Radio>
-              <Radio value={Chain.polygon}>Polygon</Radio>
+            <Stack direction="row" mx="auto">
+              <Box display="inline-block" width="170px">
+                <Radio display="flex" value={Chain.ethereum}>
+                  <Img
+                    src="/eth-logo.svg"
+                    display="inline-block"
+                    width="30px"
+                    position="relative"
+                    top="3px"
+                    marginRight="10px"
+                  />
+                  <Text display="inline" position="relative" top="-6px" as="b">
+                    Ethereum
+                  </Text>
+                </Radio>
+              </Box>
+              <Box display="inline-block" width="170px">
+                <Radio display="flex" value={Chain.optimism}>
+                  <Img
+                    src="/optimism-logo.svg"
+                    display="inline-block"
+                    width="30px"
+                    position="relative"
+                    top="3px"
+                    marginRight="10px"
+                  />
+                  <Text display="inline" position="relative" top="-6px" as="b">
+                    Optimism
+                  </Text>
+                </Radio>
+              </Box>
+              <Box display="inline-block" width="170px">
+                <Radio display="flex" value={Chain.polygon}>
+                  <Img
+                    src="/polygon-logo.svg"
+                    display="inline-block"
+                    width="30px"
+                    position="relative"
+                    top="3px"
+                    marginRight="10px"
+                  />
+                  <Text display="inline" position="relative" top="-6px" as="b">
+                    Polygon
+                  </Text>
+                </Radio>
+              </Box>
             </Stack>
           </RadioGroup>
           <InputGroup>
