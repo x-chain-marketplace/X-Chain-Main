@@ -1,6 +1,7 @@
 import { ethers } from 'ethers'
 import { SupportedChains } from './types'
 import * as PushAPI from '@pushprotocol/restapi'
+import { chain, Chain } from 'wagmi'
 
 export const mumbaiContractAddress =
   '0xC885a10d858179140Bc48283217297910A8eE0Dd'
@@ -15,6 +16,12 @@ export const chainToContractAddress = new Map<SupportedChains, string>([
 export const chainToHyperlaneId = new Map<SupportedChains, string>([
   [SupportedChains.ethereum, '5'],
   [SupportedChains.polygon, '80001'],
+])
+
+export const supportedChainToWagmiChain = new Map<SupportedChains, Chain>([
+  [SupportedChains.ethereum, chain.goerli],
+  [SupportedChains.optimism, chain.arbitrumGoerli],
+  [SupportedChains.polygon, chain.polygonMumbai],
 ])
 
 export const chainIdToCurrencyId = new Map<string, string>([

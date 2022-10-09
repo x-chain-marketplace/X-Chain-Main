@@ -42,6 +42,7 @@ import {
   chainToHyperlaneId,
   goerliContractAddress,
   mumbaiContractAddress,
+  supportedChainToWagmiChain,
 } from '../../../../utils'
 import useMarketContract from '../../../../hooks/useMarketContract'
 
@@ -108,7 +109,7 @@ const NftIndex: NextPage = () => {
     contractInterface: marketABI.abi,
     functionName: 'getListInformation',
     args: getListInformationArgs,
-    chainId: userConnectedChain?.id,
+    chainId: 80001, // userConnectedChain?.id hardcoding this for now
   })
   const listingInfo = listingInfoData as ListingInfo | undefined
   const sellerConnected = listingInfo && listingInfo[0] === address
@@ -359,7 +360,11 @@ const NftIndex: NextPage = () => {
                       Chain:
                     </Text>
                     <Text fontSize="xl" as="b" color="#ffffff">
-                      {listingChain}
+                      {
+                        supportedChainToWagmiChain.get(
+                          listingChain as SupportedChains
+                        )?.name
+                      }
                     </Text>
                   </Flex>
                 </Flex>
@@ -410,8 +415,8 @@ const NftIndex: NextPage = () => {
                 {!userConnectedChain
                   ? 'connect your wallet to buy this'
                   : ownerConnected
-                  ? `Sell on ${listingChain}`
-                  : `Buy on ${userConnectedChain.name}`}
+                  ? `Sell ${listingChain} NFT`
+                  : `Buy with funds from ${userConnectedChain.name}`}
               </Button>
             </Box>
           </>
