@@ -504,7 +504,7 @@ const NftIndex: NextPage = () => {
             <Flex justifyContent="space-between">
               <Stat mr="5">
                 <StatLabel fontSize="lg" mb="2">
-                  You're Paying
+                  You Are Paying
                 </StatLabel>
                 <Box
                   p="5"
@@ -563,7 +563,7 @@ const NftIndex: NextPage = () => {
               </Stat>
               <Stat ml="5">
                 <StatLabel fontSize="lg" mb="2">
-                  You're Recieving
+                  You Are Recieving
                 </StatLabel>
                 <Box
                   p="5"
