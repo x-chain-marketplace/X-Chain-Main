@@ -3,6 +3,7 @@ import {
   Button,
   Input,
   InputGroup,
+  useColorMode,
   InputLeftElement,
   Radio,
   RadioGroup,
@@ -17,10 +18,10 @@ import { Chain } from '../types'
 
 const Home: NextPage = () => {
   const router = useRouter()
-
   const [contract, setContract] = useState('')
   const handleContractChange = (event: any) => setContract(event.target.value)
   const [tokenId, setTokenId] = useState('')
+  const { colorMode, toggleColorMode } = useColorMode()
   const [chain, setChain] = useState(Chain.ethereum)
 
   const handleTokenIdChange = (event: any) => setTokenId(event.target.value)
@@ -87,6 +88,18 @@ const Home: NextPage = () => {
             Go
           </Button>
         </Stack>
+      </Box>
+      <Box
+        display="flex"
+        justifyContent="center"
+        position="absolute"
+        bottom="-500px"
+        right="0"
+        left="0"
+      >
+        <Button onClick={toggleColorMode} fontSize={'32px'}>
+          {colorMode === 'dark' ? '🌛' : '☀️'}
+        </Button>
       </Box>
     </Layout>
   )
