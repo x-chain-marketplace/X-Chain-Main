@@ -129,8 +129,23 @@ const NftIndex: NextPage = () => {
   )
 
   // UI Segments
+  const currentContractWrite = ownerConnected
+    ? async () => {
+        await sellNFT
+        const params = new URLSearchParams({
+          message: 'Asset listed for sale!',
+        })
+        router.push(`/done?${params.toString()}`)
+      }
+    : async () => {
+        await buyNFT
+        const params = new URLSearchParams({
+          message: 'Purchase Successful',
+          assetLink: 'mock this',
+        })
+        router.push(`/done?${params.toString()}`)
+      }
 
-  const currentContractWrite = ownerConnected ? sellNFT : buyNFT
   const modalInterior = (txnState: TransactionState) => {
     const explorerUrl = `${userConnectedChain?.blockExplorers?.default.url}/tx/${txnHash}`
 
