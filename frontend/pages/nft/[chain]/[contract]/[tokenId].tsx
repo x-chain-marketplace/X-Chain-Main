@@ -429,7 +429,7 @@ const NftIndex: NextPage = () => {
   ) => (
     <Stat mr="5">
       <StatLabel fontSize="lg" mb="2">
-        ${action}
+        {action}
       </StatLabel>
       <Box
         p="5"
@@ -582,26 +582,32 @@ const NftIndex: NextPage = () => {
           <ModalCloseButton />
           <ModalBody pb={6}>
             <Flex justifyContent="space-between">
-              {sellerConnected && listingInfo == null ? (
-                <div>idk yet</div>
-              ) : (
-                currencyActionPreview(
-                  'You are Paying',
-                  userConnectedChain?.name as string,
-                  userConnectedChain?.nativeCurrency?.name as string,
-                  (listingInfo && formatEther(listingInfo[1])) as string
-                )
-              )}
-              {sellerConnected && listingInfo == null ? (
-                <div>idk yet</div>
-              ) : (
-                nftActionPreview(
-                  'You are selling',
-                  image as string,
-                  nft?.title as string,
-                  listingChain as SupportedChains
-                )
-              )}
+              {ownerConnected
+                ? nftActionPreview(
+                    'You are Listing',
+                    image as string,
+                    nft?.title as string,
+                    listingChain as SupportedChains
+                  )
+                : currencyActionPreview(
+                    'You are paying',
+                    userConnectedChain?.name as string,
+                    userConnectedChain?.nativeCurrency?.name as string,
+                    (listingInfo && formatEther(listingInfo[1])) as string
+                  )}
+              {ownerConnected
+                ? currencyActionPreview(
+                    'You will receive upon sale',
+                    userConnectedChain?.name as string,
+                    userConnectedChain?.nativeCurrency?.name as string,
+                    (listingInfo && formatEther(listingInfo[1])) as string
+                  )
+                : nftActionPreview(
+                    'You are recieving',
+                    image as string,
+                    nft?.title as string,
+                    listingChain as SupportedChains
+                  )}
             </Flex>
           </ModalBody>
           {modalInterior(txnState)};
