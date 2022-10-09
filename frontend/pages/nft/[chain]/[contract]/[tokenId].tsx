@@ -117,7 +117,7 @@ const NftIndex: NextPage = () => {
     address != null &&
     getAddress(nftOwner) === getAddress(address)
 
-  const { txnReceipt, transactionState, buyNFT, sellNFT } = useMarketContract(
+  const { txnReceipt, txnState, txnHash, buyNFT, sellNFT } = useMarketContract(
     listingInfo,
     listingChain as SupportedChains,
     contract as string,
@@ -130,10 +130,10 @@ const NftIndex: NextPage = () => {
   // UI Segments
 
   const currentContractWrite = ownerConnected ? sellNFT : buyNFT
-  const modalInterior = (transactionState: TransactionState) => {
-    const explorerUrl = `${userConnectedChain?.blockExplorers?.default.url}/tx/${txnReceipt?.transactionHash}`
+  const modalInterior = (txnState: TransactionState) => {
+    const explorerUrl = `${userConnectedChain?.blockExplorers?.default.url}/tx/${txnHash}`
 
-    switch (transactionState) {
+    switch (txnState) {
       case TransactionState.notStarted:
         return (
           <ModalFooter display="flex" justifyContent="center">
@@ -546,7 +546,7 @@ const NftIndex: NextPage = () => {
               </Stat>
             </Flex>
           </ModalBody>
-          {modalInterior(transactionState)};
+          {modalInterior(txnState)};
         </ModalContent>
       </Modal>
     </Layout>

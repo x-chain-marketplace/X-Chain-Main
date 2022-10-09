@@ -19,9 +19,10 @@ export default function useMarketContract(
   sellerConnected: boolean,
   userConnectedChain: Chain
 ) {
-  const [transactionState, setTransactionState] = useState<TransactionState>(
+  const [txnState, setTxnState] = useState<TransactionState>(
     TransactionState.notStarted
   )
+  const [txnHash, setTxnHash] = useState<null | string>(null)
   const [txnReceipt, setTxnReceipt] = useState<null | TransactionReceipt>(null)
 
   console.log('listing info')
@@ -113,8 +114,9 @@ export default function useMarketContract(
       throw new Error('buy not ready, button should be disabled')
     }
 
-    setTransactionState(TransactionState.pending)
+    setTxnState(TransactionState.pending)
     const txnRes = await buy()
+    setTxnHash(txnRes.hash)
     console.log(`Txn hash: ${txnRes.hash}`)
     console.log('waiting')
 
@@ -122,7 +124,7 @@ export default function useMarketContract(
     console.log('Done')
     console.log(txn)
     setTxnReceipt(txn)
-    setTransactionState(TransactionState.complete)
+    setTxnState(TransactionState.complete)
   }
 
   const sellNFT = async () => {
@@ -130,8 +132,9 @@ export default function useMarketContract(
       throw new Error('Sell not ready, button should be disabled')
     }
 
-    setTransactionState(TransactionState.pending)
+    setTxnState(TransactionState.pending)
     const txnRes = await sell()
+    setTxnHash(txnRes.hash)
     console.log(`Txn hash: ${txnRes.hash}`)
     console.log('waiting')
 
@@ -139,8 +142,8 @@ export default function useMarketContract(
     console.log('Done')
     console.log(txn)
     setTxnReceipt(txn)
-    setTransactionState(TransactionState.complete)
+    setTxnState(TransactionState.complete)
   }
 
-  return { txnReceipt, transactionState, buyNFT, sellNFT }
+  return { txnHash, txnReceipt, txnState, buyNFT, sellNFT }
 }
