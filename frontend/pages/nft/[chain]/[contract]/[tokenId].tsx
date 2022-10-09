@@ -163,7 +163,13 @@ const NftIndex: NextPage = () => {
   })
   console.log('buy config')
   console.log(buyConfig)
-  const { data: buyResult, writeAsync: buy } = useContractWrite(buyConfig)
+  const {
+    data: buyResult,
+    writeAsync: buy,
+    error: buyError,
+  } = useContractWrite(buyConfig)
+  console.log('Buy Error')
+  console.log(buyError)
   console.log('Buy Result')
   console.log(buyResult)
   console.log('Buy function')
@@ -192,7 +198,13 @@ const NftIndex: NextPage = () => {
   })
   console.log('sell config')
   console.log(sellConfig)
-  const { data: sellResult, writeAsync: sell } = useContractWrite(sellConfig)
+  const {
+    data: sellResult,
+    writeAsync: sell,
+    error: sellError,
+  } = useContractWrite(sellConfig)
+  console.log('Sell Error')
+  console.log(sellError)
   console.log('Sell Result')
   console.log(sellResult)
   console.log('Sell function')
@@ -269,13 +281,14 @@ const NftIndex: NextPage = () => {
 
   // UI Segments
 
+  const currentContractWrite = ownerConnected ? sellNFT : buyNFT
   const modalInterior = (transactionState: TransactionState) => {
     switch (transactionState) {
       case TransactionState.notStarted:
         return (
           <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={buyNFT}>
-              Buy NFT
+            <Button colorScheme="blue" mr={3} onClick={currentContractWrite}>
+              {ownerConnected ? 'Sell NFT' : 'Buy NFT'}
             </Button>
             <Button onClick={onClose}>Back</Button>
           </ModalFooter>
