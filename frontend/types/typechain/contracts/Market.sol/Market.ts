@@ -45,6 +45,7 @@ export interface MarketInterface extends utils.Interface {
     "listedPrice(bytes32)": FunctionFragment;
     "outbox()": FunctionFragment;
     "owner()": FunctionFragment;
+    "paidPrice(bytes32)": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
     "selfDomainId()": FunctionFragment;
     "sellerAddress(bytes32)": FunctionFragment;
@@ -73,6 +74,7 @@ export interface MarketInterface extends utils.Interface {
       | "listedPrice"
       | "outbox"
       | "owner"
+      | "paidPrice"
       | "renounceOwnership"
       | "selfDomainId"
       | "sellerAddress"
@@ -169,6 +171,10 @@ export interface MarketInterface extends utils.Interface {
   encodeFunctionData(functionFragment: "outbox", values?: undefined): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
+    functionFragment: "paidPrice",
+    values: [PromiseOrValue<BytesLike>]
+  ): string;
+  encodeFunctionData(
     functionFragment: "renounceOwnership",
     values?: undefined
   ): string;
@@ -257,6 +263,7 @@ export interface MarketInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "outbox", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "paidPrice", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "renounceOwnership",
     data: BytesLike
@@ -460,6 +467,11 @@ export interface Market extends BaseContract {
 
     owner(overrides?: CallOverrides): Promise<[string]>;
 
+    paidPrice(
+      arg0: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
     renounceOwnership(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
@@ -600,6 +612,11 @@ export interface Market extends BaseContract {
 
   owner(overrides?: CallOverrides): Promise<string>;
 
+  paidPrice(
+    arg0: PromiseOrValue<BytesLike>,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
   renounceOwnership(
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
@@ -739,6 +756,11 @@ export interface Market extends BaseContract {
     outbox(overrides?: CallOverrides): Promise<string>;
 
     owner(overrides?: CallOverrides): Promise<string>;
+
+    paidPrice(
+      arg0: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
 
@@ -916,6 +938,11 @@ export interface Market extends BaseContract {
 
     owner(overrides?: CallOverrides): Promise<BigNumber>;
 
+    paidPrice(
+      arg0: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     renounceOwnership(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
@@ -1056,6 +1083,11 @@ export interface Market extends BaseContract {
     outbox(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    paidPrice(
+      arg0: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     renounceOwnership(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
