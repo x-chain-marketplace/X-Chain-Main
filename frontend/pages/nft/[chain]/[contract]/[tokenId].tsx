@@ -35,7 +35,12 @@ import {
 } from 'wagmi'
 import marketABI from '../../../../artifacts/contracts/Market.sol/Market.json'
 import { Chain } from '../../../../types'
-import { formatEther, getAddress, parseEther } from 'ethers/lib/utils'
+import {
+  formatEther,
+  formatUnits,
+  getAddress,
+  parseEther,
+} from 'ethers/lib/utils'
 import { BigNumber, ethers } from 'ethers'
 import * as PushAPI from '@pushprotocol/restapi'
 
@@ -114,6 +119,8 @@ const NftIndex: NextPage = () => {
     tokenId,
   ]
 
+  // GET LISTING INFORMATION
+
   const {
     data: listingInfoData,
     isError: isErrorListingInfo,
@@ -127,6 +134,12 @@ const NftIndex: NextPage = () => {
   })
   const listingInfo = listingInfoData as ListingInfo | undefined
   const sellerConnected = listingInfo && listingInfo[0] === address
+  const ownerConnected =
+    nftOwner != null &&
+    address != null &&
+    getAddress(nftOwner) === getAddress(address)
+
+  // BUY
 
   console.log('listing info')
   console.log(listingInfo)
@@ -139,8 +152,7 @@ const NftIndex: NextPage = () => {
     listingInfo && listingInfo[0],
     '2',
   ]
-
-  const { config } = usePrepareContractWrite({
+  const { config: buyConfig } = usePrepareContractWrite({
     addressOrName: chainToContractAddress.get(Chain.polygon) as string,
     contractInterface: marketABI.abi,
     functionName: 'buy',
@@ -149,27 +161,54 @@ const NftIndex: NextPage = () => {
     enabled: listingInfo != null,
     overrides: { value: parseEther('1') },
   })
-
   console.log('buy config')
-  console.log(config)
+  console.log(buyConfig)
+  const { data: buyResult, writeAsync: buy } = useContractWrite(buyConfig)
+  console.log('Buy Result')
+  console.log(buyResult)
+  console.log('Buy function')
+  console.log(buy)
 
-  const {
-    data: result,
-    isLoading,
-    isSuccess,
-    writeAsync,
-  } = useContractWrite(config)
+  // SELL
 
-  console.log('Write function')
-  console.log(writeAsync)
+  console.log(`Owner connected: ${ownerConnected}`)
+  console.log(`Seller connected: ${sellerConnected}`)
+
+  const sellArgs = [
+    contract,
+    tokenId,
+    formatUnits(parseEther('0.0001'), 'wei'),
+    '1',
+    '80001',
+    chainToContractAddress.get(Chain.polygon),
+  ]
+  const { config: sellConfig } = usePrepareContractWrite({
+    addressOrName: chainToContractAddress.get(listingChain as Chain) as string,
+    contractInterface: marketABI.abi,
+    functionName: 'list',
+    args: sellArgs,
+    chainId: 5,
+    enabled: ownerConnected,
+  })
+  console.log('sell config')
+  console.log(sellConfig)
+  const { data: sellResult, writeAsync: sell } = useContractWrite(sellConfig)
+  console.log('Sell Result')
+  console.log(sellResult)
+  console.log('Sell function')
+  console.log(sell)
+
+  // Higher level functions
+
+  // TODO DRY sell and buy XD
 
   const buyNFT = async () => {
-    if (!writeAsync) {
-      throw new Error('Write not ready, button should be disabled')
+    if (!buy) {
+      throw new Error('buy not ready, button should be disabled')
     }
 
     setTransactionState(TransactionState.pending)
-    const txnRes = await writeAsync()
+    const txnRes = await buy()
     console.log(`Txn hash: ${txnRes.hash}`)
     console.log('waiting')
 
@@ -178,6 +217,58 @@ const NftIndex: NextPage = () => {
     console.log(txn)
     setTransactionState(TransactionState.complete)
   }
+
+  const sellNFT = async () => {
+    if (!sell) {
+      throw new Error('Sell not ready, button should be disabled')
+    }
+
+    setTransactionState(TransactionState.pending)
+    const txnRes = await sell()
+    console.log(`Txn hash: ${txnRes.hash}`)
+    console.log('waiting')
+
+    const txn = await txnRes.wait()
+    console.log('Done')
+    console.log(txn)
+    setTransactionState(TransactionState.complete)
+  }
+
+  const push = async () => {
+    if (!address) return
+    const PK =
+      '75b2c1b5eb14c0a2178e06d065f804d5cb62834b4afa34328ff274ab38d755a7' // channel private key
+    const Pkey = `0x${PK}`
+    const signer = new ethers.Wallet(Pkey)
+    try {
+      const apiResponse = await PushAPI.payloads.sendNotification({
+        signer,
+        type: 3, // target
+        identityType: 2, // direct payload
+        notification: {
+          title: `Your NFT was sold`,
+          body: `{NFT_NAME was sold for {} ETH on {} network`,
+        },
+        payload: {
+          title: `Your NFT was sold`,
+          body: `{NFT_NAME was sold for {} ETH on {} network`,
+          cta: '',
+          img: '',
+        },
+        recipients: `eip155:5:${address}`, // recipient address
+        channel: 'eip155:5:0xB9dBFEF2751682519EFAC269baD93fD62C4ac455', // your channel address
+        env: 'staging',
+      })
+
+      // apiResponse?.status === 204, if sent successfully!
+      console.log('API repsonse: ', apiResponse)
+    } catch (err) {
+      console.error('Error: ', err)
+    }
+  }
+
+  // UI Segments
+
   const modalInterior = (transactionState: TransactionState) => {
     switch (transactionState) {
       case TransactionState.notStarted:
@@ -371,9 +462,11 @@ const NftIndex: NextPage = () => {
             </Box>
             <Box>
               <Button onClick={onOpen} disabled={false}>
-                {userConnectedChain
-                  ? `Buy on ${userConnectedChain.name}`
-                  : 'connect your wallet to buy this'}
+                {!userConnectedChain
+                  ? 'connect your wallet to buy this'
+                  : ownerConnected
+                  ? `Sell on ${listingChain}`
+                  : `Buy on ${userConnectedChain.name}`}
               </Button>
             </Box>
           </>
@@ -382,38 +475,7 @@ const NftIndex: NextPage = () => {
     )
   }
 
-  const push = async () => {
-    if (!address) return
-    const PK =
-      '75b2c1b5eb14c0a2178e06d065f804d5cb62834b4afa34328ff274ab38d755a7' // channel private key
-    const Pkey = `0x${PK}`
-    const signer = new ethers.Wallet(Pkey)
-    try {
-      const apiResponse = await PushAPI.payloads.sendNotification({
-        signer,
-        type: 3, // target
-        identityType: 2, // direct payload
-        notification: {
-          title: `Your NFT was sold`,
-          body: `{NFT_NAME was sold for {} ETH on {} network`,
-        },
-        payload: {
-          title: `Your NFT was sold`,
-          body: `{NFT_NAME was sold for {} ETH on {} network`,
-          cta: '',
-          img: '',
-        },
-        recipients: `eip155:5:${address}`, // recipient address
-        channel: 'eip155:5:0xB9dBFEF2751682519EFAC269baD93fD62C4ac455', // your channel address
-        env: 'staging',
-      })
-
-      // apiResponse?.status === 204, if sent successfully!
-      console.log('API repsonse: ', apiResponse)
-    } catch (err) {
-      console.error('Error: ', err)
-    }
-  }
+  // Component
 
   return (
     <Layout>
