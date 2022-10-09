@@ -1,4 +1,4 @@
-import { Box, Button, Img, Text } from '@chakra-ui/react'
+import { Box, Button, Img, Text, useToast } from '@chakra-ui/react'
 import type { NextPage } from 'next'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -28,8 +28,9 @@ const waitForNewNotification = async () => {
 
 const Done: NextPage = () => {
   const router = useRouter()
+  const toast = useToast()
   const { message, assetLink } = router.query
-  const [newNotification, setNewNotification] = useState(null)
+  const [newNotification, setNewNotification] = useState<null | any>(null)
 
   useEffect(() => {
     const wait = async () => {
@@ -39,6 +40,25 @@ const Done: NextPage = () => {
 
     wait()
   }, [])
+
+  useEffect(() => {
+    if (newNotification == null) {
+      return
+    } 
+
+    toast({
+      render: () => (
+        <Box color='white' display="flex" alignItems="center" mx="auto" textAlign="center" width="500px" p={5} bg='#ffffff99' borderRadius="xl">
+          <Img
+            display="flex"
+            mr="20px"
+            src="/push.png"
+          />
+          <Text fontSize="22px" textAlign="left" fontWeight="600" color="#000" justifyContent="center">{`New Notification : ${newNotification?.message}`}</Text>
+        </Box>
+      ),
+    })
+  }, [newNotification])
 
   return (
     <Layout>
@@ -58,9 +78,6 @@ const Done: NextPage = () => {
           justifyContent="center"
           width="250px"
         />
-        <Text fontSize="27px" mb="50px">
-          {`New notification: ${newNotification}`}
-        </Text>
         <Text fontSize="27px" mb="50px">
           {message}
         </Text>
