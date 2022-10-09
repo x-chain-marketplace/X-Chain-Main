@@ -23,15 +23,13 @@ export const Layout = ({ children, customMeta }: LayoutProps): JSX.Element => {
             <Flex>
               <Image
                 mb={4}
+                width={300}
                 ml={5}
                 pr={5}
-                src="/logo.png"
-                fallbackSrc="/logo.png"
+                src="/zipchain-logo.svg"
+                fallbackSrc="/zipchain-logo.svg"
                 borderRadius="full"
               />
-              <Text mt="5">
-                Hello World
-              </Text>
             </Flex>
             <Flex
               order={[-1, null, null, 2]}
