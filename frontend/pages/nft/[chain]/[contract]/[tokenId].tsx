@@ -421,6 +421,127 @@ const NftIndex: NextPage = () => {
   }
 
   // Component
+  const currencyActionPreview = (
+    action: string,
+    chain: string,
+    currencyName: string,
+    price: string
+  ) => (
+    <Stat mr="5">
+      <StatLabel fontSize="lg" mb="2">
+        ${action}
+      </StatLabel>
+      <Box
+        p="5"
+        border="1px"
+        display="flex"
+        borderRadius="xl"
+        flexDirection="column"
+        justifyContent="center"
+        background="linear-gradient(180deg, #27183F 0%, #170D27 100%)"
+        minHeight="400px"
+        borderColor="#ccc"
+      >
+        <div>
+          <Flex>
+            <Image
+              mb={10}
+              ml={5}
+              pr={5}
+              src="/price-icon.svg"
+              fallbackSrc="/price-icon.svg"
+            />
+            <Flex flexDirection="column">
+              <Text fontSize="xs" color="#fff">
+                Price:
+              </Text>
+              <Text fontSize="xl" as="b" color="#fff">
+                <StatNumber>{`${price} ${currencyName}`}</StatNumber>
+              </Text>
+            </Flex>
+          </Flex>
+        </div>
+        <div>
+          <Flex>
+            <Image
+              mb={4}
+              ml={5}
+              pr={5}
+              src="/chain-icon.svg"
+              fallbackSrc="/chain-icon.svg"
+            />
+            <Flex flexDirection="column">
+              <Text fontSize="xs" color="#fff">
+                Chain:
+              </Text>
+              <Text fontSize="xl" as="b" color="#fff">
+                {chain}
+              </Text>
+            </Flex>
+          </Flex>
+        </div>
+      </Box>
+    </Stat>
+  )
+
+  const nftActionPreview = (
+    action: string,
+    image: string,
+    nftName: string,
+    chain: SupportedChains
+  ) => (
+    <Stat ml="5">
+      <StatLabel fontSize="lg" mb="2">
+        {action}
+      </StatLabel>
+      <Box
+        p="5"
+        border="1px"
+        borderColor="#ccc"
+        minHeight="400px"
+        background="linear-gradient(180deg, #27183F 0%, #170D27 100%)"
+        borderRadius="xl"
+      >
+        <Img
+          display="block"
+          mx="auto"
+          boxSize="xs"
+          width="200px"
+          height="100%"
+          src={image}
+        />
+        <StatNumber
+          display="flex"
+          color="#fff"
+          justifyContent="center"
+          mt="2"
+          fontSize="xl"
+          mb="5"
+        >
+          {nftName}
+        </StatNumber>
+        <div>
+          <Flex>
+            <Image
+              mb={4}
+              ml={5}
+              pr={5}
+              src="/chain-icon.svg"
+              fallbackSrc="/chain-icon.svg"
+            />
+            <Flex flexDirection="column">
+              <Text color="#fff" fontSize="xs">
+                Chain:
+              </Text>
+              <Text color="#fff" fontSize="xl" as="b">
+                {chain}
+              </Text>
+            </Flex>
+          </Flex>
+        </div>
+      </Box>
+    </Stat>
+  )
 
   return (
     <Layout>
@@ -461,117 +582,26 @@ const NftIndex: NextPage = () => {
           <ModalCloseButton />
           <ModalBody pb={6}>
             <Flex justifyContent="space-between">
-              <Stat mr="5">
-                <StatLabel fontSize="lg" mb="2">
-                  You Are Paying
-                </StatLabel>
-                <Box
-                  p="5"
-                  border="1px"
-                  display="flex"
-                  borderRadius="xl"
-                  flexDirection="column"
-                  justifyContent="center"
-                  background="linear-gradient(180deg, #27183F 0%, #170D27 100%)"
-                  minHeight="400px"
-                  borderColor="#ccc"
-                >
-                  <div>
-                    <Flex>
-                      <Image
-                        mb={10}
-                        ml={5}
-                        pr={5}
-                        src="/price-icon.svg"
-                        fallbackSrc="/price-icon.svg"
-                      />
-                      <Flex flexDirection="column">
-                        <Text fontSize="xs" color="#fff">
-                          Price:
-                        </Text>
-                        <Text fontSize="xl" as="b" color="#fff">
-                          <StatNumber>{`${
-                            listingInfo && formatEther(listingInfo[1])
-                          } ${
-                            userConnectedChain?.nativeCurrency?.name
-                          }`}</StatNumber>
-                        </Text>
-                      </Flex>
-                    </Flex>
-                  </div>
-                  <div>
-                    <Flex>
-                      <Image
-                        mb={4}
-                        ml={5}
-                        pr={5}
-                        src="/chain-icon.svg"
-                        fallbackSrc="/chain-icon.svg"
-                      />
-                      <Flex flexDirection="column">
-                        <Text fontSize="xs" color="#fff">
-                          Chain:
-                        </Text>
-                        <Text fontSize="xl" as="b" color="#fff">
-                          {userConnectedChain?.name}
-                        </Text>
-                      </Flex>
-                    </Flex>
-                  </div>
-                </Box>
-              </Stat>
-              <Stat ml="5">
-                <StatLabel fontSize="lg" mb="2">
-                  You Are Recieving
-                </StatLabel>
-                <Box
-                  p="5"
-                  border="1px"
-                  borderColor="#ccc"
-                  minHeight="400px"
-                  background="linear-gradient(180deg, #27183F 0%, #170D27 100%)"
-                  borderRadius="xl"
-                >
-                  <Img
-                    display="block"
-                    mx="auto"
-                    boxSize="xs"
-                    width="200px"
-                    height="100%"
-                    src={image}
-                  />
-                  <StatNumber
-                    display="flex"
-                    color="#fff"
-                    justifyContent="center"
-                    mt="2"
-                    fontSize="xl"
-                    mb="5"
-                  >
-                    {nft?.title}
-                  </StatNumber>
-
-                  <div>
-                    <Flex>
-                      <Image
-                        mb={4}
-                        ml={5}
-                        pr={5}
-                        src="/chain-icon.svg"
-                        fallbackSrc="/chain-icon.svg"
-                      />
-                      <Flex flexDirection="column">
-                        <Text color="#fff" fontSize="xs">
-                          Chain:
-                        </Text>
-                        <Text color="#fff" fontSize="xl" as="b">
-                          {listingChain}
-                        </Text>
-                      </Flex>
-                    </Flex>
-                  </div>
-                </Box>
-              </Stat>
+              {sellerConnected && listingInfo == null ? (
+                <div>idk yet</div>
+              ) : (
+                currencyActionPreview(
+                  'You are Paying',
+                  userConnectedChain?.name as string,
+                  userConnectedChain?.nativeCurrency?.name as string,
+                  (listingInfo && formatEther(listingInfo[1])) as string
+                )
+              )}
+              {sellerConnected && listingInfo == null ? (
+                <div>idk yet</div>
+              ) : (
+                nftActionPreview(
+                  'You are selling',
+                  image as string,
+                  nft?.title as string,
+                  listingChain as SupportedChains
+                )
+              )}
             </Flex>
           </ModalBody>
           {modalInterior(txnState)};
