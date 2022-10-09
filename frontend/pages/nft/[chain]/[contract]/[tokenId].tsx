@@ -62,6 +62,11 @@ const chainToHyperlaneId = new Map<Chain, string>([
   [Chain.polygon, '80001'],
 ])
 
+const chainIdToCurrencyId = new Map<string, string>([
+  ['80001', '2'],
+  ['5', '1'],
+])
+
 enum TransactionState {
   pending = 'pending',
   failed = 'failed',
@@ -137,7 +142,7 @@ const NftIndex: NextPage = () => {
     contractInterface: marketABI.abi,
     functionName: 'getListInformation',
     args: getListInformationArgs,
-    chainId: userConnectedChain?.id ?? 80001,
+    chainId: userConnectedChain?.id,
   })
   const listingInfo = listingInfoData as ListingInfo | undefined
   const sellerConnected = listingInfo && listingInfo[0] === address
@@ -151,13 +156,21 @@ const NftIndex: NextPage = () => {
   console.log('listing info')
   console.log(listingInfo)
 
+  const nftSourceDomainId = chainToHyperlaneId.get(listingChain as Chain)
+  const nftSourceContractAddress = chainToContractAddress.get(
+    listingChain as Chain
+  )
+  const sellerAddress = listingInfo && listingInfo[0]
+  const buyerCurrencyId =
+    userConnectedChain &&
+    chainIdToCurrencyId.get(userConnectedChain.id.toString() as string)
   const buyArgs = [
-    chainToHyperlaneId.get(listingChain as Chain),
-    chainToContractAddress.get(listingChain as Chain),
+    nftSourceDomainId,
+    nftSourceContractAddress,
     contract,
     tokenId,
-    listingInfo && listingInfo[0],
-    '2',
+    sellerAddress,
+    buyerCurrencyId,
   ]
   const { config: buyConfig } = usePrepareContractWrite({
     addressOrName: chainToContractAddress.get(Chain.polygon) as string,
@@ -187,13 +200,16 @@ const NftIndex: NextPage = () => {
   console.log(`Owner connected: ${ownerConnected}`)
   console.log(`Seller connected: ${sellerConnected}`)
 
+  const currencyId = listingChain === Chain.ethereum ? '1' : '2'
+  const chainId = listingChain === Chain.ethereum ? '80001' : '5'
+  const contractToMessage = chainToContractAddress.get(Chain.polygon)
   const sellArgs = [
     contract,
     tokenId,
     formatUnits(parseEther('0.0001'), 'wei'),
-    '1',
-    '80001',
-    chainToContractAddress.get(Chain.polygon),
+    currencyId,
+    chainId,
+    contractToMessage,
   ]
   const { config: sellConfig } = usePrepareContractWrite({
     addressOrName: chainToContractAddress.get(listingChain as Chain) as string,
@@ -415,7 +431,7 @@ const NftIndex: NextPage = () => {
       return <Spinner />
     }
 
-    if (listingInfo == null) {
+    if (!listedWithUs) {
       return (
         <>
           <Text color="#ffffff" fontSize="lg">
@@ -429,6 +445,14 @@ const NftIndex: NextPage = () => {
             </Button>
           ) : null}
         </>
+      )
+    }
+
+    if (listingInfo == null || isErrorListingInfo) {
+      return (
+        <Text color="#ffffff" fontSize="lg">
+          There was a problem loading in listing data
+        </Text>
       )
     }
 
