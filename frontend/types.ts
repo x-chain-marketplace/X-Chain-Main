@@ -1,3 +1,5 @@
+import { BigNumber } from 'ethers'
+
 export enum SupportedChains {
   ethereum = 'ethereum',
   optimism = 'optimism',
@@ -10,3 +12,6 @@ export enum TransactionState {
   complete = 'complete',
   notStarted = 'notStarted',
 }
+
+// sellerAddress, price, currencyId
+export type ListingInfo = [string, BigNumber, string]
