@@ -13,7 +13,7 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 import { Layout } from '../components/layout/Layout'
-import { Chain } from '../types'
+import { SupportedChains } from '../types'
 
 const Home: NextPage = () => {
   const router = useRouter()
@@ -21,7 +21,7 @@ const Home: NextPage = () => {
   const [contract, setContract] = useState('')
   const handleContractChange = (event: any) => setContract(event.target.value)
   const [tokenId, setTokenId] = useState('')
-  const [chain, setChain] = useState(Chain.ethereum)
+  const [chain, setChain] = useState(SupportedChains.ethereum)
 
   const handleTokenIdChange = (event: any) => setTokenId(event.target.value)
   return (
@@ -29,13 +29,13 @@ const Home: NextPage = () => {
       <Box maxW="lg" mx="auto">
         <Stack spacing={4}>
           <RadioGroup
-            onChange={(value) => setChain(value as Chain)}
+            onChange={(value) => setChain(value as SupportedChains)}
             value={chain}
           >
             <Stack direction="row">
-              <Radio value={Chain.ethereum}>Ethereum</Radio>
-              <Radio value={Chain.optimism}>Optimism</Radio>
-              <Radio value={Chain.polygon}>Polygon</Radio>
+              <Radio value={SupportedChains.ethereum}>Ethereum</Radio>
+              <Radio value={SupportedChains.optimism}>Optimism</Radio>
+              <Radio value={SupportedChains.polygon}>Polygon</Radio>
             </Stack>
           </RadioGroup>
           <InputGroup>

@@ -1,17 +1,17 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { Network, Alchemy, Nft } from 'alchemy-sdk'
-import { Chain } from '../../../../../types'
+import { SupportedChains } from '../../../../../types'
 
 const chainToKey = new Map([
-  [Chain.ethereum, process.env.ETH_KEY],
-  [Chain.optimism, process.env.OPTIMISM_KEY],
-  [Chain.polygon, process.env.POLYGON_KEY],
+  [SupportedChains.ethereum, process.env.ETH_KEY],
+  [SupportedChains.optimism, process.env.OPTIMISM_KEY],
+  [SupportedChains.polygon, process.env.POLYGON_KEY],
 ])
 
 const chainToNetwork = new Map([
-  [Chain.ethereum, Network.ETH_GOERLI],
-  [Chain.polygon, Network.MATIC_MUMBAI],
-  [Chain.optimism, Network.OPT_GOERLI],
+  [SupportedChains.ethereum, Network.ETH_GOERLI],
+  [SupportedChains.polygon, Network.MATIC_MUMBAI],
+  [SupportedChains.optimism, Network.OPT_GOERLI],
 ])
 
 export default async function handler(
@@ -20,7 +20,7 @@ export default async function handler(
 ) {
   const { chain, contract, tokenId } = req.query
 
-  const supportedChains = Object.values(Chain)
+  const supportedChains = Object.values(SupportedChains)
   if (!supportedChains.includes(chain as any)) {
     return res.status(400).json({
       message: `chain ${chain} is not valid, supported chains: ${JSON.stringify(
@@ -30,8 +30,8 @@ export default async function handler(
   }
 
   const settings = {
-    apiKey: chainToKey.get(chain as Chain), // Replace with your Alchemy API Key.
-    network: chainToNetwork.get(chain as Chain), // Replace with your network.
+    apiKey: chainToKey.get(chain as SupportedChains), // Replace with your Alchemy API Key.
+    network: chainToNetwork.get(chain as SupportedChains), // Replace with your network.
   }
   const alchemy = new Alchemy(settings)
   const data = await alchemy.nft.getNftMetadata(

@@ -38,7 +38,7 @@ import {
   usePrepareContractWrite,
 } from 'wagmi'
 import marketABI from '../../../../artifacts/contracts/Market.sol/Market.json'
-import { Chain } from '../../../../types'
+import { SupportedChains, TransactionState } from '../../../../types'
 import {
   formatEther,
   formatUnits,
@@ -48,31 +48,13 @@ import {
 import { BigNumber, ethers } from 'ethers'
 import * as PushAPI from '@pushprotocol/restapi'
 import { TransactionReceipt } from '@ethersproject/providers'
-
-const mumbaiContractAddress = '0xC885a10d858179140Bc48283217297910A8eE0Dd'
-const goerliContractAddress = '0x3bbF06ad0468F4883e3142A7c7dB6CaD12229cd1'
-
-const chainToContractAddress = new Map<Chain, string>([
-  [Chain.ethereum, goerliContractAddress],
-  [Chain.polygon, mumbaiContractAddress],
-])
-
-const chainToHyperlaneId = new Map<Chain, string>([
-  [Chain.ethereum, '5'],
-  [Chain.polygon, '80001'],
-])
-
-const chainIdToCurrencyId = new Map<string, string>([
-  ['80001', '2'],
-  ['5', '1'],
-])
-
-enum TransactionState {
-  pending = 'pending',
-  failed = 'failed',
-  complete = 'complete',
-  notStarted = 'notStarted',
-}
+import {
+  chainIdToCurrencyId,
+  chainToContractAddress,
+  chainToHyperlaneId,
+  goerliContractAddress,
+  mumbaiContractAddress,
+} from '../../../../utils'
 
 // sellerAddress, price, currencyId
 type ListingInfo = [string, BigNumber, string]
@@ -126,7 +108,7 @@ const NftIndex: NextPage = () => {
   const image = nft?.media[0].gateway
 
   const getListInformationArgs = [
-    chainToHyperlaneId.get(listingChain as Chain) as string,
+    chainToHyperlaneId.get(listingChain as SupportedChains) as string,
     contract,
     tokenId,
   ]
@@ -138,7 +120,9 @@ const NftIndex: NextPage = () => {
     isError: isErrorListingInfo,
     isLoading: isLoadingListingInfo,
   } = useContractRead({
-    addressOrName: chainToContractAddress.get(Chain.polygon) as string,
+    addressOrName: chainToContractAddress.get(
+      SupportedChains.polygon
+    ) as string,
     contractInterface: marketABI.abi,
     functionName: 'getListInformation',
     args: getListInformationArgs,
@@ -156,9 +140,11 @@ const NftIndex: NextPage = () => {
   console.log('listing info')
   console.log(listingInfo)
 
-  const nftSourceDomainId = chainToHyperlaneId.get(listingChain as Chain)
+  const nftSourceDomainId = chainToHyperlaneId.get(
+    listingChain as SupportedChains
+  )
   const nftSourceContractAddress = chainToContractAddress.get(
-    listingChain as Chain
+    listingChain as SupportedChains
   )
   const sellerAddress = listingInfo && listingInfo[0]
   const buyerCurrencyId =
@@ -173,7 +159,9 @@ const NftIndex: NextPage = () => {
     buyerCurrencyId,
   ]
   const { config: buyConfig } = usePrepareContractWrite({
-    addressOrName: chainToContractAddress.get(Chain.polygon) as string,
+    addressOrName: chainToContractAddress.get(
+      SupportedChains.polygon
+    ) as string,
     contractInterface: marketABI.abi,
     functionName: 'buy',
     args: buyArgs,
@@ -200,9 +188,9 @@ const NftIndex: NextPage = () => {
   console.log(`Owner connected: ${ownerConnected}`)
   console.log(`Seller connected: ${sellerConnected}`)
 
-  const currencyId = listingChain === Chain.ethereum ? '1' : '2'
-  const chainId = listingChain === Chain.ethereum ? '80001' : '5'
-  const contractToMessage = chainToContractAddress.get(Chain.polygon)
+  const currencyId = listingChain === SupportedChains.ethereum ? '1' : '2'
+  const chainId = listingChain === SupportedChains.ethereum ? '80001' : '5'
+  const contractToMessage = chainToContractAddress.get(SupportedChains.polygon)
   const sellArgs = [
     contract,
     tokenId,
@@ -212,7 +200,9 @@ const NftIndex: NextPage = () => {
     contractToMessage,
   ]
   const { config: sellConfig } = usePrepareContractWrite({
-    addressOrName: chainToContractAddress.get(listingChain as Chain) as string,
+    addressOrName: chainToContractAddress.get(
+      listingChain as SupportedChains
+    ) as string,
     contractInterface: marketABI.abi,
     functionName: 'list',
     args: sellArgs,
