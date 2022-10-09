@@ -493,7 +493,7 @@ const NftIndex: NextPage = () => {
     action: string,
     image: string,
     nftName: string,
-    chain: SupportedChains
+    chain: string
   ) => (
     <Stat ml="5">
       <StatLabel fontSize="lg" mb="2">
@@ -592,7 +592,9 @@ const NftIndex: NextPage = () => {
                     'You are Listing',
                     image as string,
                     nft?.title as string,
-                    listingChain as SupportedChains
+                    supportedChainToWagmiChain.get(
+                      listingChain as SupportedChains
+                    )?.name as string
                   )
                 : currencyActionPreview(
                     'You are paying',
@@ -611,7 +613,9 @@ const NftIndex: NextPage = () => {
                     'You are recieving',
                     image as string,
                     nft?.title as string,
-                    listingChain as SupportedChains
+                    supportedChainToWagmiChain.get(
+                      listingChain as SupportedChains
+                    )?.name as string
                   )}
             </Flex>
           </ModalBody>
