@@ -293,8 +293,13 @@ const NftIndex: NextPage = () => {
     if (!listedWithUs) {
       return (
         <>
-          <Text color="#ffffff" fontSize="lg">
-            not listed with us!
+           <Image
+              display="block" mx="auto" mt="20" mb="5"
+              src="/caution.svg"
+              fallbackSrc="/caution.svg"
+            />
+          <Text color="#ffffff" as="b" display="flex" justifyContent="center" fontSize="lg">
+            This Asset is Not Listed with Us!
           </Text>
           {ownerConnected ? (
             <Button onClick={onOpen} disabled={false}>
