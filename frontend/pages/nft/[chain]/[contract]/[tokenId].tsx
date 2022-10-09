@@ -8,7 +8,9 @@ import {
   Heading,
   Img,
   Image,
-  Text,
+  Input,
+  InputGroup,
+  InputLeftElement,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -22,6 +24,7 @@ import {
   Stat,
   StatLabel,
   StatNumber,
+  Text,
 } from '@chakra-ui/react'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
@@ -472,6 +475,66 @@ const NftIndex: NextPage = () => {
                   : `Buy with funds from ${userConnectedChain.name}`}
               </Button>
             </Box>
+
+
+{/* THIS IS FOR THE SELL PRICE BOX */}
+            <Box
+              display="flex"
+              justifyContent="center"
+              flexDirection="column"
+              padding="40px"
+              background="linear-gradient(180deg, #27183F 0%, #170D27 100%);"
+            >
+              <Text
+                fontSize="xl"
+                color="#fff"
+                as="b"
+                display="flex"
+                justifyContent="center"
+              >
+                Set Sell Price
+              </Text>
+
+              <InputGroup mt="15px" mb="10px">
+                <Input
+                  type="text"
+                  placeholder="0.0 ETH"
+                  background="#fff"
+                  textAlign="center"
+                  fontSize="20px"
+                  fontWeight="700"
+                  color="#000"
+                  _placeholder={{
+                    color: '#000',
+                    fontSize: '20px',
+                    fontWeight: '700',
+                  }}
+                />
+              </InputGroup>
+              <Button
+                background="#FF6600"
+                border="2px solid #FF6600"
+                padding="25px 20px"
+                color="#fff"
+                borderRadius="120px"
+                fontSize="20px"
+                _hover={{
+                  background: '#ff660099',
+                  transition: '0.5s',
+                  transform: 'scale(1.05)',
+                  color: '#fff',
+                }}
+              >
+                {!userConnectedChain
+                  ? 'connect your wallet to buy this'
+                  : ownerConnected
+                  ? `Sell ${listingChain} NFT`
+                  : `Buy with funds from ${userConnectedChain.name}`}
+              </Button>
+            </Box>
+
+            {/* THIS ENDS THE SELL PRICE BOX */}
+
           </>
         )}
       </Box>
