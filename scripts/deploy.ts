@@ -25,9 +25,23 @@ async function main() {
   const mumbaiDomain = "80001";
   const moonbeamDomain = "0x6d6f2d61";
 
+  const goerliPushCommContractAddress =
+    "0xb3971bcef2d791bc4027bbfedfb47319a4aaaaaa";
+  const mumbaiPushCommContractAddress =
+    "0xb3971BCef2D791bc4027BbfedFb47319A4AAaaAa";
+  const zeroaddress = "0x0000000000000000000000000000000000000000";
+
+  const goerliPushChannelAddress = "0x3584ba4C558A5ff7cb153a355d892Cd20D0A6206";
+  const mumbaiPushChannelAddress = "";
+
 
   const MarketContract = await ethers.getContractFactory('Market');
-  const market = await MarketContract.deploy(goerliOutboxAddress, goerliDomain);
+  const market = await MarketContract.deploy(
+    goerliOutboxAddress,
+    goerliDomain,
+    goerliPushCommContractAddress,
+    goerliPushChannelAddress
+  );
   await market.deployed();
   console.log("YourContract deployed to:", market.address);
 
