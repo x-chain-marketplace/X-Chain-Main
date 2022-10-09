@@ -16,15 +16,15 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 import { Layout } from '../components/layout/Layout'
-import { Chain } from '../types'
+import { SupportedChains } from '../types'
 
 const Home: NextPage = () => {
   const router = useRouter()
   const [contract, setContract] = useState('')
   const handleContractChange = (event: any) => setContract(event.target.value)
   const [tokenId, setTokenId] = useState('')
+  const [chain, setChain] = useState(SupportedChains.ethereum)
   const { colorMode, toggleColorMode } = useColorMode()
-  const [chain, setChain] = useState(Chain.ethereum)
 
   const handleTokenIdChange = (event: any) => setTokenId(event.target.value)
   return (
@@ -32,12 +32,12 @@ const Home: NextPage = () => {
       <Box maxW="lg" mx="auto">
         <Stack spacing={4}>
           <RadioGroup
-            onChange={(value) => setChain(value as Chain)}
+            onChange={(value) => setChain(value as SupportedChains)}
             value={chain}
           >
             <Stack direction="row" mx="auto">
               <Box display="inline-block" width="170px">
-                <Radio display="flex" value={Chain.ethereum}>
+                <Radio display="flex" value={SupportedChains.ethereum}>
                   <Img
                     src="/eth-logo.svg"
                     display="inline-block"
@@ -52,7 +52,7 @@ const Home: NextPage = () => {
                 </Radio>
               </Box>
               <Box display="inline-block" width="170px">
-                <Radio display="flex" value={Chain.optimism}>
+                <Radio display="flex" value={SupportedChains.optimism}>
                   <Img
                     src="/optimism-logo.svg"
                     display="inline-block"
@@ -67,7 +67,7 @@ const Home: NextPage = () => {
                 </Radio>
               </Box>
               <Box display="inline-block" width="170px">
-                <Radio display="flex" value={Chain.polygon}>
+                <Radio display="flex" value={SupportedChains.polygon}>
                   <Img
                     src="/polygon-logo.svg"
                     display="inline-block"

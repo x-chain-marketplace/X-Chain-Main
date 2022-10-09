@@ -22,7 +22,6 @@ import {
   Stat,
   StatLabel,
   StatNumber,
-  StatHelpText,
 } from '@chakra-ui/react'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
@@ -30,52 +29,22 @@ import { useEffect, useState } from 'react'
 import { Layout } from '../../../../components/layout/Layout'
 import { Nft } from 'alchemy-sdk'
 import axios from 'axios'
-import {
-  useAccount,
-  useContractRead,
-  useNetwork,
-  useContractWrite,
-  usePrepareContractWrite,
-} from 'wagmi'
+import { useAccount, useContractRead, useNetwork, Chain } from 'wagmi'
 import marketABI from '../../../../artifacts/contracts/Market.sol/Market.json'
-import { Chain } from '../../../../types'
 import {
-  formatEther,
-  formatUnits,
-  getAddress,
-  parseEther,
-} from 'ethers/lib/utils'
-import { BigNumber, ethers } from 'ethers'
-import * as PushAPI from '@pushprotocol/restapi'
-import { TransactionReceipt } from '@ethersproject/providers'
-
-const mumbaiContractAddress = '0xC885a10d858179140Bc48283217297910A8eE0Dd'
-const goerliContractAddress = '0x3bbF06ad0468F4883e3142A7c7dB6CaD12229cd1'
-
-const chainToContractAddress = new Map<Chain, string>([
-  [Chain.ethereum, goerliContractAddress],
-  [Chain.polygon, mumbaiContractAddress],
-])
-
-const chainToHyperlaneId = new Map<Chain, string>([
-  [Chain.ethereum, '5'],
-  [Chain.polygon, '80001'],
-])
-
-const chainIdToCurrencyId = new Map<string, string>([
-  ['80001', '2'],
-  ['5', '1'],
-])
-
-enum TransactionState {
-  pending = 'pending',
-  failed = 'failed',
-  complete = 'complete',
-  notStarted = 'notStarted',
-}
-
-// sellerAddress, price, currencyId
-type ListingInfo = [string, BigNumber, string]
+  ListingInfo,
+  SupportedChains,
+  TransactionState,
+} from '../../../../types'
+import { formatEther, getAddress } from 'ethers/lib/utils'
+import {
+  chainToContractAddress,
+  chainToHyperlaneId,
+  goerliContractAddress,
+  mumbaiContractAddress,
+  supportedChainToWagmiChain,
+} from '../../../../utils'
+import useMarketContract from '../../../../hooks/useMarketContract'
 
 const NftIndex: NextPage = () => {
   const router = useRouter()
@@ -87,10 +56,6 @@ const NftIndex: NextPage = () => {
   const [nftOwner, setNftOwner] = useState<string | null>(null)
   const [isLoadingMetadata, setIsLoadingMetadata] = useState<boolean>(false)
   const [isErrorFetchingMetadata, setIsErrorFetchingMetadata] = useState(false)
-  const [transactionState, setTransactionState] = useState<TransactionState>(
-    TransactionState.notStarted
-  )
-  const [txnReceipt, setTxnReceipt] = useState<null | TransactionReceipt>(null)
   const { colorMode, toggleColorMode } = useColorMode()
 
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -126,7 +91,7 @@ const NftIndex: NextPage = () => {
   const image = nft?.media[0].gateway
 
   const getListInformationArgs = [
-    chainToHyperlaneId.get(listingChain as Chain) as string,
+    chainToHyperlaneId.get(listingChain as SupportedChains) as string,
     contract,
     tokenId,
   ]
@@ -138,11 +103,13 @@ const NftIndex: NextPage = () => {
     isError: isErrorListingInfo,
     isLoading: isLoadingListingInfo,
   } = useContractRead({
-    addressOrName: chainToContractAddress.get(Chain.polygon) as string,
+    addressOrName: chainToContractAddress.get(
+      SupportedChains.polygon
+    ) as string,
     contractInterface: marketABI.abi,
     functionName: 'getListInformation',
     args: getListInformationArgs,
-    chainId: userConnectedChain?.id,
+    chainId: 80001, // userConnectedChain?.id hardcoding this for now
   })
   const listingInfo = listingInfoData as ListingInfo | undefined
   const sellerConnected = listingInfo && listingInfo[0] === address
@@ -151,166 +118,23 @@ const NftIndex: NextPage = () => {
     address != null &&
     getAddress(nftOwner) === getAddress(address)
 
-  // BUY
-
-  console.log('listing info')
-  console.log(listingInfo)
-
-  const nftSourceDomainId = chainToHyperlaneId.get(listingChain as Chain)
-  const nftSourceContractAddress = chainToContractAddress.get(
-    listingChain as Chain
+  const { txnReceipt, txnState, txnHash, buyNFT, sellNFT } = useMarketContract(
+    listingInfo,
+    listingChain as SupportedChains,
+    contract as string,
+    tokenId as string,
+    ownerConnected,
+    sellerConnected as boolean,
+    userConnectedChain as Chain
   )
-  const sellerAddress = listingInfo && listingInfo[0]
-  const buyerCurrencyId =
-    userConnectedChain &&
-    chainIdToCurrencyId.get(userConnectedChain.id.toString() as string)
-  const buyArgs = [
-    nftSourceDomainId,
-    nftSourceContractAddress,
-    contract,
-    tokenId,
-    sellerAddress,
-    buyerCurrencyId,
-  ]
-  const { config: buyConfig } = usePrepareContractWrite({
-    addressOrName: chainToContractAddress.get(Chain.polygon) as string,
-    contractInterface: marketABI.abi,
-    functionName: 'buy',
-    args: buyArgs,
-    chainId: userConnectedChain?.id ?? 80001,
-    enabled: listingInfo != null,
-    overrides: { value: parseEther('0.5') },
-  })
-  console.log('buy config')
-  console.log(buyConfig)
-  const {
-    data: buyResult,
-    writeAsync: buy,
-    error: buyError,
-  } = useContractWrite(buyConfig)
-  console.log('Buy Error')
-  console.log(buyError)
-  console.log('Buy Result')
-  console.log(buyResult)
-  console.log('Buy function')
-  console.log(buy)
-
-  // SELL
-
-  console.log(`Owner connected: ${ownerConnected}`)
-  console.log(`Seller connected: ${sellerConnected}`)
-
-  const currencyId = listingChain === Chain.ethereum ? '1' : '2'
-  const chainId = listingChain === Chain.ethereum ? '80001' : '5'
-  const contractToMessage = chainToContractAddress.get(Chain.polygon)
-  const sellArgs = [
-    contract,
-    tokenId,
-    formatUnits(parseEther('0.0001'), 'wei'),
-    currencyId,
-    chainId,
-    contractToMessage,
-  ]
-  const { config: sellConfig } = usePrepareContractWrite({
-    addressOrName: chainToContractAddress.get(listingChain as Chain) as string,
-    contractInterface: marketABI.abi,
-    functionName: 'list',
-    args: sellArgs,
-    chainId: 5,
-    enabled: ownerConnected,
-  })
-  console.log('sell config')
-  console.log(sellConfig)
-  const {
-    data: sellResult,
-    writeAsync: sell,
-    error: sellError,
-  } = useContractWrite(sellConfig)
-  console.log('Sell Error')
-  console.log(sellError)
-  console.log('Sell Result')
-  console.log(sellResult)
-  console.log('Sell function')
-  console.log(sell)
-
-  // Higher level functions
-
-  // TODO DRY sell and buy XD
-
-  const buyNFT = async () => {
-    if (!buy) {
-      throw new Error('buy not ready, button should be disabled')
-    }
-
-    setTransactionState(TransactionState.pending)
-    const txnRes = await buy()
-    console.log(`Txn hash: ${txnRes.hash}`)
-    console.log('waiting')
-
-    const txn = await txnRes.wait()
-    console.log('Done')
-    console.log(txn)
-    setTxnReceipt(txn)
-    setTransactionState(TransactionState.complete)
-  }
-
-  const sellNFT = async () => {
-    if (!sell) {
-      throw new Error('Sell not ready, button should be disabled')
-    }
-
-    setTransactionState(TransactionState.pending)
-    const txnRes = await sell()
-    console.log(`Txn hash: ${txnRes.hash}`)
-    console.log('waiting')
-
-    const txn = await txnRes.wait()
-    console.log('Done')
-    console.log(txn)
-    setTxnReceipt(txn)
-    setTransactionState(TransactionState.complete)
-  }
-
-  const push = async () => {
-    if (!address) return
-    const PK =
-      '75b2c1b5eb14c0a2178e06d065f804d5cb62834b4afa34328ff274ab38d755a7' // channel private key
-    const Pkey = `0x${PK}`
-    const signer = new ethers.Wallet(Pkey)
-    try {
-      const apiResponse = await PushAPI.payloads.sendNotification({
-        signer,
-        type: 3, // target
-        identityType: 2, // direct payload
-        notification: {
-          title: `Your NFT was sold`,
-          body: `{NFT_NAME was sold for {} ETH on {} network`,
-        },
-        payload: {
-          title: `Your NFT was sold`,
-          body: `{NFT_NAME was sold for {} ETH on {} network`,
-          cta: '',
-          img: '',
-        },
-        recipients: `eip155:5:${address}`, // recipient address
-        channel: 'eip155:5:0xB9dBFEF2751682519EFAC269baD93fD62C4ac455', // your channel address
-        env: 'staging',
-      })
-
-      // apiResponse?.status === 204, if sent successfully!
-      console.log('API repsonse: ', apiResponse)
-    } catch (err) {
-      console.error('Error: ', err)
-    }
-  }
 
   // UI Segments
 
   const currentContractWrite = ownerConnected ? sellNFT : buyNFT
-  const modalInterior = (transactionState: TransactionState) => {
-    const explorerUrl = `${userConnectedChain?.blockExplorers?.default.url}/tx/${txnReceipt?.transactionHash}`
+  const modalInterior = (txnState: TransactionState) => {
+    const explorerUrl = `${userConnectedChain?.blockExplorers?.default.url}/tx/${txnHash}`
 
-    switch (transactionState) {
+    switch (txnState) {
       case TransactionState.notStarted:
         return (
           <ModalFooter display="flex" justifyContent="center">
@@ -536,7 +360,11 @@ const NftIndex: NextPage = () => {
                       Chain:
                     </Text>
                     <Text fontSize="xl" as="b" color="#ffffff">
-                      {listingChain}
+                      {
+                        supportedChainToWagmiChain.get(
+                          listingChain as SupportedChains
+                        )?.name
+                      }
                     </Text>
                   </Flex>
                 </Flex>
@@ -587,8 +415,8 @@ const NftIndex: NextPage = () => {
                 {!userConnectedChain
                   ? 'connect your wallet to buy this'
                   : ownerConnected
-                  ? `Sell on ${listingChain}`
-                  : `Buy on ${userConnectedChain.name}`}
+                  ? `Sell ${listingChain} NFT`
+                  : `Buy with funds from ${userConnectedChain.name}`}
               </Button>
             </Box>
           </>
@@ -598,6 +426,127 @@ const NftIndex: NextPage = () => {
   }
 
   // Component
+  const currencyActionPreview = (
+    action: string,
+    chain: string,
+    currencyName: string,
+    price: string
+  ) => (
+    <Stat mr="5">
+      <StatLabel fontSize="lg" mb="2">
+        {action}
+      </StatLabel>
+      <Box
+        p="5"
+        border="1px"
+        display="flex"
+        borderRadius="xl"
+        flexDirection="column"
+        justifyContent="center"
+        background="linear-gradient(180deg, #27183F 0%, #170D27 100%)"
+        minHeight="400px"
+        borderColor="#ccc"
+      >
+        <div>
+          <Flex>
+            <Image
+              mb={10}
+              ml={5}
+              pr={5}
+              src="/price-icon.svg"
+              fallbackSrc="/price-icon.svg"
+            />
+            <Flex flexDirection="column">
+              <Text fontSize="xs" color="#fff">
+                Price:
+              </Text>
+              <Text fontSize="xl" as="b" color="#fff">
+                <StatNumber>{`${price} ${currencyName}`}</StatNumber>
+              </Text>
+            </Flex>
+          </Flex>
+        </div>
+        <div>
+          <Flex>
+            <Image
+              mb={4}
+              ml={5}
+              pr={5}
+              src="/chain-icon.svg"
+              fallbackSrc="/chain-icon.svg"
+            />
+            <Flex flexDirection="column">
+              <Text fontSize="xs" color="#fff">
+                Chain:
+              </Text>
+              <Text fontSize="xl" as="b" color="#fff">
+                {chain}
+              </Text>
+            </Flex>
+          </Flex>
+        </div>
+      </Box>
+    </Stat>
+  )
+
+  const nftActionPreview = (
+    action: string,
+    image: string,
+    nftName: string,
+    chain: SupportedChains
+  ) => (
+    <Stat ml="5">
+      <StatLabel fontSize="lg" mb="2">
+        {action}
+      </StatLabel>
+      <Box
+        p="5"
+        border="1px"
+        borderColor="#ccc"
+        minHeight="400px"
+        background="linear-gradient(180deg, #27183F 0%, #170D27 100%)"
+        borderRadius="xl"
+      >
+        <Img
+          display="block"
+          mx="auto"
+          boxSize="xs"
+          width="200px"
+          height="100%"
+          src={image}
+        />
+        <StatNumber
+          display="flex"
+          color="#fff"
+          justifyContent="center"
+          mt="2"
+          fontSize="xl"
+          mb="5"
+        >
+          {nftName}
+        </StatNumber>
+        <div>
+          <Flex>
+            <Image
+              mb={4}
+              ml={5}
+              pr={5}
+              src="/chain-icon.svg"
+              fallbackSrc="/chain-icon.svg"
+            />
+            <Flex flexDirection="column">
+              <Text color="#fff" fontSize="xs">
+                Chain:
+              </Text>
+              <Text color="#fff" fontSize="xl" as="b">
+                {chain}
+              </Text>
+            </Flex>
+          </Flex>
+        </div>
+      </Box>
+    </Stat>
+  )
 
   return (
     <Layout>
@@ -638,120 +587,35 @@ const NftIndex: NextPage = () => {
           <ModalCloseButton />
           <ModalBody pb={6}>
             <Flex justifyContent="space-between">
-              <Stat mr="5">
-                <StatLabel fontSize="lg" mb="2">
-                  You Are Paying
-                </StatLabel>
-                <Box
-                  p="5"
-                  border="1px"
-                  display="flex"
-                  borderRadius="xl"
-                  flexDirection="column"
-                  justifyContent="center"
-                  background="linear-gradient(180deg, #27183F 0%, #170D27 100%)"
-                  minHeight="400px"
-                  borderColor="#ccc"
-                >
-                  <div>
-                    <Flex>
-                      <Image
-                        mb={10}
-                        ml={5}
-                        pr={5}
-                        src="/price-icon.svg"
-                        fallbackSrc="/price-icon.svg"
-                      />
-                      <Flex flexDirection="column">
-                        <Text fontSize="xs" color="#fff">
-                          Price:
-                        </Text>
-                        <Text fontSize="xl" as="b" color="#fff">
-                          <StatNumber>{`${
-                            listingInfo && formatEther(listingInfo[1])
-                          } ${
-                            userConnectedChain?.nativeCurrency?.name
-                          }`}</StatNumber>
-                        </Text>
-                      </Flex>
-                    </Flex>
-                  </div>
-                  <div>
-                    <Flex>
-                      <Image
-                        mb={4}
-                        ml={5}
-                        pr={5}
-                        src="/chain-icon.svg"
-                        fallbackSrc="/chain-icon.svg"
-                      />
-                      <Flex flexDirection="column">
-                        <Text fontSize="xs" color="#fff">
-                          Chain:
-                        </Text>
-                        <Text fontSize="xl" as="b" color="#fff">
-                          {userConnectedChain?.name}
-                        </Text>
-                      </Flex>
-                    </Flex>
-                  </div>
-                </Box>
-              </Stat>
-              <Stat ml="5">
-                <StatLabel fontSize="lg" mb="2">
-                  You Are Recieving
-                </StatLabel>
-                <Box
-                  p="5"
-                  border="1px"
-                  borderColor="#ccc"
-                  minHeight="400px"
-                  background="linear-gradient(180deg, #27183F 0%, #170D27 100%)"
-                  borderRadius="xl"
-                >
-                  <Img
-                    display="block"
-                    mx="auto"
-                    boxSize="xs"
-                    width="200px"
-                    height="100%"
-                    src={image}
-                  />
-                  <StatNumber
-                    display="flex"
-                    color="#fff"
-                    justifyContent="center"
-                    mt="2"
-                    fontSize="xl"
-                    mb="5"
-                  >
-                    {nft?.title}
-                  </StatNumber>
-
-                  <div>
-                    <Flex>
-                      <Image
-                        mb={4}
-                        ml={5}
-                        pr={5}
-                        src="/chain-icon.svg"
-                        fallbackSrc="/chain-icon.svg"
-                      />
-                      <Flex flexDirection="column">
-                        <Text color="#fff" fontSize="xs">
-                          Chain:
-                        </Text>
-                        <Text color="#fff" fontSize="xl" as="b">
-                          {listingChain}
-                        </Text>
-                      </Flex>
-                    </Flex>
-                  </div>
-                </Box>
-              </Stat>
+              {ownerConnected
+                ? nftActionPreview(
+                    'You are Listing',
+                    image as string,
+                    nft?.title as string,
+                    listingChain as SupportedChains
+                  )
+                : currencyActionPreview(
+                    'You are paying',
+                    userConnectedChain?.name as string,
+                    userConnectedChain?.nativeCurrency?.name as string,
+                    (listingInfo && formatEther(listingInfo[1])) as string
+                  )}
+              {ownerConnected
+                ? currencyActionPreview(
+                    'You will receive upon sale',
+                    userConnectedChain?.name as string,
+                    userConnectedChain?.nativeCurrency?.name as string,
+                    (listingInfo && formatEther(listingInfo[1])) as string
+                  )
+                : nftActionPreview(
+                    'You are recieving',
+                    image as string,
+                    nft?.title as string,
+                    listingChain as SupportedChains
+                  )}
             </Flex>
           </ModalBody>
-          {modalInterior(transactionState)};
+          {modalInterior(txnState)};
         </ModalContent>
       </Modal>
     </Layout>
