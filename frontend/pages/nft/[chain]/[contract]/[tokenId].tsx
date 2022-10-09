@@ -26,10 +26,16 @@ import { useEffect, useState } from 'react'
 import { Layout } from '../../../../components/layout/Layout'
 import { Nft } from 'alchemy-sdk'
 import axios from 'axios'
-import { useAccount, useContractRead, useNetwork } from 'wagmi'
+import {
+  useAccount,
+  useContractRead,
+  useNetwork,
+  useContractWrite,
+  usePrepareContractWrite,
+} from 'wagmi'
 import marketABI from '../../../../artifacts/contracts/Market.sol/Market.json'
 import { Chain } from '../../../../types'
-import { formatEther, getAddress } from 'ethers/lib/utils'
+import { formatEther, getAddress, parseEther } from 'ethers/lib/utils'
 import { BigNumber } from 'ethers'
 
 const mumbaiContractAddress = '0xC885a10d858179140Bc48283217297910A8eE0Dd'
@@ -113,7 +119,7 @@ const NftIndex: NextPage = () => {
     isLoading: isLoadingListingInfo,
   } = useContractRead({
     addressOrName: chainToContractAddress.get(Chain.polygon) as string,
-    contractInterface: marketABI as any,
+    contractInterface: marketABI.abi,
     functionName: 'getListInformation',
     args: getListInformationArgs,
     chainId: userConnectedChain?.id ?? 80001,
@@ -121,11 +127,54 @@ const NftIndex: NextPage = () => {
   const listingInfo = listingInfoData as ListingInfo | undefined
   const sellerConnected = listingInfo && listingInfo[0] === address
 
+  console.log('listing info')
+  console.log(listingInfo)
+
+  const buyArgs = [
+    chainToHyperlaneId.get(listingChain as Chain),
+    chainToContractAddress.get(listingChain as Chain),
+    contract,
+    tokenId,
+    listingInfo && listingInfo[0],
+    '2',
+  ]
+
+  const { config } = usePrepareContractWrite({
+    addressOrName: chainToContractAddress.get(Chain.polygon) as string,
+    contractInterface: marketABI.abi,
+    functionName: 'buy',
+    args: buyArgs,
+    chainId: userConnectedChain?.id ?? 80001,
+    enabled: listingInfo != null,
+    overrides: { value: parseEther('1') },
+  })
+
+  console.log('buy config')
+  console.log(config)
+
+  const {
+    data: result,
+    isLoading,
+    isSuccess,
+    writeAsync,
+  } = useContractWrite(config)
+
+  console.log('Write function')
+  console.log(writeAsync)
+
   const buyNFT = async () => {
+    if (!writeAsync) {
+      throw new Error('Write not ready, button should be disabled')
+    }
+
     setTransactionState(TransactionState.pending)
-    await new Promise((resolve) => {
-      setTimeout(resolve, 10 * 1000)
-    })
+    const txnRes = await writeAsync()
+    console.log(`Txn hash: ${txnRes.hash}`)
+    console.log('waiting')
+
+    const txn = await txnRes.wait()
+    console.log('Done')
+    console.log(txn)
     setTransactionState(TransactionState.complete)
   }
   const modalInterior = (transactionState: TransactionState) => {
@@ -303,7 +352,10 @@ const NftIndex: NextPage = () => {
               </div>
             </Box>
             <Box>
-              <Button onClick={onOpen}>
+              <Button
+                onClick={onOpen}
+                disabled={writeAsync == null || userConnectedChain == null}
+              >
                 {userConnectedChain
                   ? `Buy on ${userConnectedChain.name}`
                   : 'connect your wallet to buy this'}
