@@ -30,7 +30,15 @@ const Home: NextPage = () => {
   return (
     <Layout>
       <Box maxW="lg" mx="auto">
-        <Text mb="3" display="flex" fontSize="20px" opacity="0.7" fontWeight="300">Select Chain:</Text>
+        <Text
+          mb="3"
+          display="flex"
+          fontSize="20px"
+          opacity="0.7"
+          fontWeight="300"
+        >
+          Select Chain:
+        </Text>
         <Stack spacing={4}>
           <RadioGroup
             onChange={(value) => setChain(value as SupportedChains)}
@@ -85,33 +93,42 @@ const Home: NextPage = () => {
             </Stack>
           </RadioGroup>
           <div>
-          <Text mb="3" display="flex" fontSize="20px" opacity="0.7" fontWeight="300" mt="20px">Enter NFT Contract Address and Id:</Text>
-          <InputGroup mt="15px" mb="10px">
-            <InputLeftElement
-              pointerEvents="none"
-              color="#fff"
-              fontSize="1.2em"
-            />
-            <Input
-              type="text"
-              placeholder="contract address"
-              value={contract}
-              onChange={handleContractChange}
-            />
-          </InputGroup>
-          <InputGroup>
-            <InputLeftElement
-              pointerEvents="none"
-              color="gray.300"
-              fontSize="1.2em"
-            />
-            <Input
-              type="text"
-              placeholder="tokenId"
-              value={tokenId}
-              onChange={handleTokenIdChange}
-            />
-          </InputGroup>
+            <Text
+              mb="3"
+              display="flex"
+              fontSize="20px"
+              opacity="0.7"
+              fontWeight="300"
+              mt="20px"
+            >
+              Enter NFT Contract Address and Id:
+            </Text>
+            <InputGroup mt="15px" mb="10px">
+              <InputLeftElement
+                pointerEvents="none"
+                color="#fff"
+                fontSize="1.2em"
+              />
+              <Input
+                type="text"
+                placeholder="contract address"
+                value={contract}
+                onChange={handleContractChange}
+              />
+            </InputGroup>
+            <InputGroup>
+              <InputLeftElement
+                pointerEvents="none"
+                color="gray.300"
+                fontSize="1.2em"
+              />
+              <Input
+                type="text"
+                placeholder="tokenId"
+                value={tokenId}
+                onChange={handleTokenIdChange}
+              />
+            </InputGroup>
           </div>
 
           <Button
