@@ -9,6 +9,9 @@ https://mumbai.polygonscan.com/address/0x12256d5D9429D15457F2bA8d303221136e0e994
 ### Polygon
 https://polygonscan.com/address/0xa2e541300cdf197C6e27e1Ad341b12eA283FA595#code
 
+Why we use Polygon :)
+https://twitter.com/0xYuzu_/status/1579187648400216064
+
 ### Optimism
 https://optimistic.etherscan.io/address/0xee064652655fa40e8e455a2004fd6c75a8e750eb
 
