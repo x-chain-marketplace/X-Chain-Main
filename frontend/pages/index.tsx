@@ -4,7 +4,6 @@ import {
   Input,
   InputGroup,
   useColorMode,
-  InputLeftElement,
   Radio,
   RadioGroup,
   Stack,
@@ -104,29 +103,37 @@ const Home: NextPage = () => {
               Enter NFT Contract Address and Id:
             </Text>
             <InputGroup mt="15px" mb="10px">
-              <InputLeftElement
-                pointerEvents="none"
-                color="#fff"
-                fontSize="1.2em"
-              />
               <Input
                 type="text"
-                placeholder="contract address"
+                background="#fff"
+                color="#000"
+                fontWeight="600"
+                fontSize='20px'
+                placeholder="Contract Address"
                 value={contract}
                 onChange={handleContractChange}
+                _placeholder={{
+                  color: '#00000080',
+                  fontSize: '20px',
+                  fontWeight: '500',
+                }}
               />
             </InputGroup>
             <InputGroup>
-              <InputLeftElement
-                pointerEvents="none"
-                color="gray.300"
-                fontSize="1.2em"
-              />
               <Input
                 type="text"
-                placeholder="tokenId"
+                placeholder="TokenId"
+                background="#fff"
+                color="#000"
+                fontSize='20px'
+                fontWeight="600"
                 value={tokenId}
                 onChange={handleTokenIdChange}
+                _placeholder={{
+                  color: '#00000080',
+                  fontSize: '20px',
+                  fontWeight: '600',
+                }}
               />
             </InputGroup>
           </div>
@@ -158,7 +165,7 @@ const Home: NextPage = () => {
         display="flex"
         justifyContent="center"
         position="absolute"
-        bottom="-500px"
+        bottom="-400px"
         right="0"
         left="0"
       >
