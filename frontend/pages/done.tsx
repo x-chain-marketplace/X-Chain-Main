@@ -31,7 +31,7 @@ const Done: NextPage = () => {
           {message}
         </Text>
         {assetLink ? (
-          <Link width="30px" href={assetLink as string}>
+          <Link href={assetLink as string}>
             <Button
               mt={4}
               background="#FF6600"
