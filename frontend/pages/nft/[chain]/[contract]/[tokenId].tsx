@@ -387,11 +387,30 @@ const NftIndex: NextPage = () => {
       return <Spinner />
     }
 
-    if (listingInfo == null || isErrorListingInfo) {
+    const actionButton = (
+      <Button onClick={onOpen} disabled={false}>
+        {!userConnectedChain
+          ? 'connect your wallet to buy this'
+          : ownerConnected
+          ? `Sell on ${listingChain}`
+          : `Buy on ${userConnectedChain.name}`}
+      </Button>
+    )
+
+    if (listingInfo == null) {
       return (
-        <Text color="#ffffff" fontSize="lg">
-          Something went wrong while fetching listing Info
-        </Text>
+        <>
+          <Text color="#ffffff" fontSize="lg">
+            not listed with us!
+          </Text>
+          {ownerConnected ? (
+            <Button onClick={onOpen} disabled={false}>
+              {!userConnectedChain
+                ? 'connect your wallet to list your NFT'
+                : `Sell on ${listingChain}`}
+            </Button>
+          ) : null}
+        </>
       )
     }
 
