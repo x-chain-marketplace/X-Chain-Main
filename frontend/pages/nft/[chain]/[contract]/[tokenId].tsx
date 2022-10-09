@@ -26,10 +26,16 @@ import { useEffect, useState } from 'react'
 import { Layout } from '../../../../components/layout/Layout'
 import { Nft } from 'alchemy-sdk'
 import axios from 'axios'
-import { useAccount, useContractRead, useNetwork } from 'wagmi'
+import {
+  useAccount,
+  useContractRead,
+  useNetwork,
+  useContractWrite,
+  usePrepareContractWrite,
+} from 'wagmi'
 import marketABI from '../../../../artifacts/contracts/Market.sol/Market.json'
 import { Chain } from '../../../../types'
-import { formatEther, getAddress } from 'ethers/lib/utils'
+import { formatEther, getAddress, parseEther } from 'ethers/lib/utils'
 import { BigNumber, ethers } from 'ethers'
 import * as PushAPI from '@pushprotocol/restapi'
 
@@ -114,7 +120,7 @@ const NftIndex: NextPage = () => {
     isLoading: isLoadingListingInfo,
   } = useContractRead({
     addressOrName: chainToContractAddress.get(Chain.polygon) as string,
-    contractInterface: marketABI as any,
+    contractInterface: marketABI.abi,
     functionName: 'getListInformation',
     args: getListInformationArgs,
     chainId: userConnectedChain?.id ?? 80001,
@@ -122,11 +128,54 @@ const NftIndex: NextPage = () => {
   const listingInfo = listingInfoData as ListingInfo | undefined
   const sellerConnected = listingInfo && listingInfo[0] === address
 
+  console.log('listing info')
+  console.log(listingInfo)
+
+  const buyArgs = [
+    chainToHyperlaneId.get(listingChain as Chain),
+    chainToContractAddress.get(listingChain as Chain),
+    contract,
+    tokenId,
+    listingInfo && listingInfo[0],
+    '2',
+  ]
+
+  const { config } = usePrepareContractWrite({
+    addressOrName: chainToContractAddress.get(Chain.polygon) as string,
+    contractInterface: marketABI.abi,
+    functionName: 'buy',
+    args: buyArgs,
+    chainId: userConnectedChain?.id ?? 80001,
+    enabled: listingInfo != null,
+    overrides: { value: parseEther('1') },
+  })
+
+  console.log('buy config')
+  console.log(config)
+
+  const {
+    data: result,
+    isLoading,
+    isSuccess,
+    writeAsync,
+  } = useContractWrite(config)
+
+  console.log('Write function')
+  console.log(writeAsync)
+
   const buyNFT = async () => {
+    if (!writeAsync) {
+      throw new Error('Write not ready, button should be disabled')
+    }
+
     setTransactionState(TransactionState.pending)
-    await new Promise((resolve) => {
-      setTimeout(resolve, 10 * 1000)
-    })
+    const txnRes = await writeAsync()
+    console.log(`Txn hash: ${txnRes.hash}`)
+    console.log('waiting')
+
+    const txn = await txnRes.wait()
+    console.log('Done')
+    console.log(txn)
     setTransactionState(TransactionState.complete)
   }
   const modalInterior = (transactionState: TransactionState) => {
@@ -304,7 +353,10 @@ const NftIndex: NextPage = () => {
               </div>
             </Box>
             <Box>
-              <Button onClick={onOpen}>
+              <Button
+                onClick={onOpen}
+                disabled={writeAsync == null || userConnectedChain == null}
+              >
                 {userConnectedChain
                   ? `Buy on ${userConnectedChain.name}`
                   : 'connect your wallet to buy this'}
@@ -319,7 +371,7 @@ const NftIndex: NextPage = () => {
   const push = async () => {
     if (!address) return
     const PK =
-      '75b2c1b5eb14c0a2178e06d065f804d5cb62834b4afa34328ff274ab38d755a7'// channel private key
+      '75b2c1b5eb14c0a2178e06d065f804d5cb62834b4afa34328ff274ab38d755a7' // channel private key
     const Pkey = `0x${PK}`
     const signer = new ethers.Wallet(Pkey)
     try {
@@ -351,22 +403,6 @@ const NftIndex: NextPage = () => {
 
   return (
     <Layout>
-      <Box>
-        {nftData(nft, isLoadingMetadata)}
-        {listingData(listingInfo, isLoadingListingInfo)}
-        <Box marginTop={10}>
-          <div>{`current wallet address: ${address}`}</div>
-          <div>{`listing chain: ${listingChain}`}</div>
-          <div>{`contract address: ${contract}`}</div>
-          <div>{`tokenId: ${tokenId}`}</div>
-          <div>{`NFT seller currenctly connected: ${sellerConnected}`}</div>
-        </Box>
-        <Button onClick={push}>Push</Button>
-      </Box>
-      <Button onClick={toggleColorMode} size={'sm'} variant="link">
-        {colorMode === 'light' ? <Text> </Text> : <Text> </Text>}
-      </Button>
-
       <Grid
         h="500px"
         templateRows="repeat(2, 1fr)"
